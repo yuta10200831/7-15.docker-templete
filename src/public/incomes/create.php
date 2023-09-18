@@ -1,3 +1,10 @@
+<?php
+$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
+$stmt = $pdo->query("SELECT * FROM income_sources");
+$income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,7 +13,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 flex justify-center">
-  
+
   <div class="mx-auto my-8 w-3/5">
     <div class="container p-4 bg-white rounded shadow-lg">
       <h1 class="text-3xl mb-4 text-center">収入登録</h1>
@@ -24,11 +31,14 @@
       <form action="store.php" method="POST">
         <div class="mb-4">
           <label for="income-source" class="block text-sm font-medium text-gray-600">収入源</label>
-            <select id="income-source" name="income_source_id" class="mt-1 p-2 w-1/2">
+          <select id="income-source" name="income_source_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
-              <option value="1">給与</option>
-              <option value="2">賞与</option>
-            </select>
+              <?php foreach ($income_sources as $income_source): ?>
+                <option value="<?php echo $income_source['id']; ?>">
+              <?php echo htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
             <a href="income_sources/index.php" class="ml-4 p-2 bg-green-500 text-white">収入源一覧へ</a>
         </div>
 
