@@ -28,6 +28,7 @@
               <option value="1">給与</option>
               <option value="2">賞与</option>
             </select>
+            <a href="income_sources/index.php" class="ml-4 p-2 bg-green-500 text-white">収入源一覧へ</a>
         </div>
 
         <div class="mb-4 flex items-center">
