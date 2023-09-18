@@ -19,10 +19,10 @@ if (!empty($error_messages)) {
   exit;
 }
 
-// DB接続（これも環境に合わせてね）
+// DB接続
 $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
 
-// DBへの保存（注意：カラム名をあなたのDBに合わせて修正してね）
+// DBへの保存
 $stmt = $pdo->prepare("INSERT INTO incomes (user_id, income_source_id, amount, accrual_date) VALUES (0, ?, ?, ?)");
 $result = $stmt->execute([$income_source_id, $amount, $accrual_date]);
 

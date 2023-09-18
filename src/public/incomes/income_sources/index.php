@@ -21,20 +21,20 @@ $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <nav>
         <ul class="flex justify-between">
           <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
-          <li><a class="text-white hover:text-blue-800" href="incomes/index.php">収入TOP</a></li>
+          <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">支出TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">ログイン</a></li>
         </ul>
       </nav>
     </header>
-    
+
     <!-- メインコンテンツ -->
     <div class="mx-auto my-8">
       <div class="container p-4 bg-white rounded shadow-lg">
         <h1 class="text-3xl mb-4 text-center">収入源一覧</h1>
         <!-- 収入源を追加するボタン -->
         <div class="mb-4">
-          <a href="add_income_source.php" class="p-2 bg-blue-500 text-white">収入源を追加する</a>
+          <a href="create.php" class="p-2 bg-blue-500 text-white">収入源を追加する</a>
         </div>
 
         <!-- 収入源のリスト -->
@@ -51,8 +51,8 @@ $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach ($income_sources as $income_source) {
               echo '<tr>';
               echo '<td class="border px-4 py-2">' . htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8') . '</td>';
-              echo '<td class="border px-4 py-2"><a href="edit_income_source.php?id=' . $income_source['id'] . '">編集</a></td>';
-              echo '<td class="border px-4 py-2"><a href="delete_income_source.php?id=' . $income_source['id'] . '">削除</a></td>';
+              echo '<td class="border px-4 py-2"><a href="edit_income_source.php?id=' . $income_source['id'] . '" class="p-1 bg-blue-500 text-white rounded">編集</a></td>';
+              echo '<td class="border px-4 py-2"><a href="delete_income_source.php?id=' . $income_source['id'] . '" class="p-1 bg-red-500 text-white rounded">削除</a></td>';              
               echo '</tr>';
             }
             ?>

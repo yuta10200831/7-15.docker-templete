@@ -6,6 +6,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 flex justify-center">
+  
   <div class="mx-auto my-8 w-3/5">
     <div class="container p-4 bg-white rounded shadow-lg">
       <h1 class="text-3xl mb-4 text-center">収入登録</h1>
