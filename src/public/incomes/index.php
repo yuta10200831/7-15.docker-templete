@@ -28,7 +28,7 @@
 
       <!-- 新規作成ボタン -->
       <div class="mt-4 text-right">
-        <a href="incomes/create.php" class="inline-block p-2 bg-green-500 text-white">収入を登録する</a>
+        <a href="create.php" class="inline-block p-2 bg-green-500 text-white">収入を登録する</a>
       </div>
 
       <!-- 検索バー -->
