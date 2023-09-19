@@ -88,8 +88,8 @@ foreach ($incomes as $income) {
             <td class="border px-4 py-2"><?php echo htmlspecialchars($income['income_source_name'], ENT_QUOTES, 'UTF-8'); ?></td>
             <td class="border px-4 py-2"><?php echo htmlspecialchars($income['amount'], ENT_QUOTES, 'UTF-8'); ?>円</td>
             <td class="border px-4 py-2"><?php echo htmlspecialchars($income['accrual_date'], ENT_QUOTES, 'UTF-8'); ?></td>
-            <td class="border px-4 py-2"><button class="p-2 bg-blue-500 text-white">編集</button></td>
-            <td class="border px-4 py-2"><button class="p-2 bg-red-500 text-white">削除</button></td>
+            <td class="border px-4 py-2"><a href="edit.php?id=<?php echo $income['id']; ?>" class="p-2 bg-blue-500 text-white">編集</a></td>
+            <td class="border px-4 py-2"><a href="delete.php?id=<?php echo $income['id']; ?>" class="p-2 bg-red-500 text-white">削除</a></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
