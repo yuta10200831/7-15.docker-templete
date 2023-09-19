@@ -47,15 +47,15 @@ $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tr>
           </thead>
           <tbody>
-            <?php
+          <?php
             foreach ($income_sources as $income_source) {
               echo '<tr>';
               echo '<td class="border px-4 py-2">' . htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8') . '</td>';
-              echo '<td class="border px-4 py-2"><a href="edit_income_source.php?id=' . $income_source['id'] . '" class="p-1 bg-blue-500 text-white rounded">編集</a></td>';
-              echo '<td class="border px-4 py-2"><a href="delete_income_source.php?id=' . $income_source['id'] . '" class="p-1 bg-red-500 text-white rounded">削除</a></td>';              
+              echo '<td class="border px-4 py-2"><a href="edit.php?id=' . $income_source['id'] . '" class="p-2 bg-blue-500 text-white">編集</a></td>';
+              echo '<td class="border px-4 py-2"><a href="delete.php?id=' . $income_source['id'] . '" class="p-2 bg-red-500 text-white">削除</a></td>';
               echo '</tr>';
-            }
-            ?>
+          }
+          ?>
           </tbody>
         </table>
 
