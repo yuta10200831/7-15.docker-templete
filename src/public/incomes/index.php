@@ -1,13 +1,37 @@
 <?php
+// DB接続
 $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
 
+// 収入源を取得
 $stmt = $pdo->query("SELECT * FROM income_sources");
 $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $pdo->query("SELECT * FROM incomes");
-$incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// 検索条件を取得
+$search_income_source_id = $_GET['income_source_id'] ?? null;
+$search_start_date = $_GET['start_date'] ?? null;
+$search_end_date = $_GET['end_date'] ?? null;
 
-$stmt = $pdo->query("SELECT incomes.*, income_sources.name AS income_source_name FROM incomes INNER JOIN income_sources ON incomes.income_source_id = income_sources.id");
+// 収入情報を取得（条件に応じて）
+$sql = "SELECT incomes.*, income_sources.name AS income_source_name FROM incomes INNER JOIN income_sources ON incomes.income_source_id = income_sources.id";
+$params = [];
+
+if (!empty($search_income_source_id)) {
+  $sql .= " WHERE incomes.income_source_id = ?";
+  $params[] = $search_income_source_id;
+}
+
+if (!empty($search_start_date)) {
+  $sql .= (empty($params) ? " WHERE" : " AND") . " incomes.accrual_date >= ?";
+  $params[] = $search_start_date;
+}
+
+if (!empty($search_end_date)) {
+  $sql .= (empty($params) ? " WHERE" : " AND") . " incomes.accrual_date <= ?";
+  $params[] = $search_end_date;
+}
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // 合計を出す処理
@@ -15,7 +39,6 @@ $total_income = 0;
 foreach ($incomes as $income) {
     $total_income += $income['amount'];
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -51,11 +74,12 @@ foreach ($incomes as $income) {
         <a href="create.php" class="inline-block p-2 bg-green-500 text-white">収入を登録する</a>
       </div>
 
-      <!-- 検索バー -->
+    <!-- 検索バー -->
+    <form action="index.php" method="GET">
       <div class="flex flex-col items-center mb-8">
         <p class="mb-2">絞り込み検索</p>
         <div class="flex items-center">
-        <label for="income-source" class="mr-5 flex-shrink-0">収入源：</label>
+          <label for="income-source" class="mr-5 flex-shrink-0">収入源：</label>
           <select id="income-source" name="income_source_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
               <?php foreach ($income_sources as $income_source): ?>
@@ -63,13 +87,14 @@ foreach ($incomes as $income) {
               <?php echo htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8'); ?>
               </option>
             <?php endforeach; ?>
-            </select>
-          <input type="date" id="start-date" class="mr-2 p-2">
+          </select>
+          <input type="date" name="start_date" id="start-date" class="mr-2 p-2">
           <span class="align-middle">〜</span>
-          <input type="date" id="end-date" class="mr-2 p-2">
-          <button id="search-button" class="p-2 bg-blue-500 text-white">検索</button>
+          <input type="date" name="end_date" id="end-date" class="mr-2 p-2">
+          <button type="submit" id="search-button" class="p-2 bg-blue-500 text-white">検索</button>
         </div>
       </div>
+    </form>
 
       <!-- 収入テーブル -->
       <table class="mx-auto w-full border-collapse border">
