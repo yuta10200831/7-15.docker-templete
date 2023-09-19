@@ -17,7 +17,7 @@
             <a class="text-white hover:text-blue-800" href="#">収入TOP</a>
           </li>
           <li>
-            <a class="text-white hover:text-blue-800" href="#">支出TOP</a>
+            <a class="text-white hover:text-blue-800" href="spendings/index.php">支出TOP</a>
           </li>
           <li>
             <a class="text-white hover:text-blue-800" href="#">ログイン</a>
