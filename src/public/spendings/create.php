@@ -1,7 +1,8 @@
 <?php
+
 $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-$stmt = $pdo->query("SELECT * FROM spendings");
-$income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $pdo->query("SELECT * FROM categories");
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -51,9 +52,9 @@ $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <label for="income-source" class="block text-sm font-medium text-gray-600">カテゴリー：</label>
           <select id="income-source" name="category_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
-              <?php foreach ($income_sources as $income_source): ?>
-                <option value="<?php echo $income_source['id']; ?>">
-              <?php echo htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8'); ?>
+              <?php foreach ($categories as $category): ?>
+                <option value="<?php echo $category['id']; ?>">
+              <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
               </option>
             <?php endforeach; ?>
           </select>

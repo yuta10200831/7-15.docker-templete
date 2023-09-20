@@ -5,7 +5,7 @@ $error_messages = [];
 
 // POSTで送られてきたデータを取得
 $name = $_POST['name'] ?? null;
-$category_id = 1; // ここは後でちゃんとした値に更新する
+$category_id = $_POST['category_id'] ?? null;
 $amount = $_POST['amount'] ?? null;
 $accrual_date = $_POST['accrual_date'] ?? null;
 
