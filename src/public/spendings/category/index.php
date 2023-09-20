@@ -4,7 +4,7 @@ $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'passwo
 
 // SQL文でデータを取得
 $stmt = $pdo->query("SELECT * FROM categories");
-$income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +22,7 @@ $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <ul class="flex justify-between">
           <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
           <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
-          <li><a class="text-white hover:text-blue-800" href="index.php">支出TOP</a></li>
+          <li><a class="text-white hover:text-blue-800" href="/spendings/index.php">支出TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">ログイン</a></li>
         </ul>
       </nav>
@@ -48,11 +48,11 @@ $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </thead>
           <tbody>
           <?php
-            foreach ($income_sources as $income_source) {
+            foreach ($categories as $category) {
               echo '<tr>';
-              echo '<td class="border px-4 py-2">' . htmlspecialchars($categories['name'], ENT_QUOTES, 'UTF-8') . '</td>';
-              echo '<td class="border px-4 py-2"><a href="edit.php?id=' . $categories['id'] . '" class="p-2 bg-blue-500 text-white">編集</a></td>';
-              echo '<td class="border px-4 py-2"><a href="delete.php?id=' . $categories['id'] . '" class="p-2 bg-red-500 text-white">削除</a></td>';
+              echo '<td class="border px-4 py-2">' . htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') . '</td>';
+              echo '<td class="border px-4 py-2"><a href="edit.php?id=' . $category['id'] . '" class="p-2 bg-blue-500 text-white">編集</a></td>';
+              echo '<td class="border px-4 py-2"><a href="delete.php?id=' . $category['id'] . '" class="p-2 bg-red-500 text-white">削除</a></td>';
               echo '</tr>';
           }
           ?>
