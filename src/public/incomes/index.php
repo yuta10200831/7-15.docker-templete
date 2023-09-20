@@ -1,3 +1,46 @@
+<?php
+// DB接続
+$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
+
+// 収入源を取得
+$stmt = $pdo->query("SELECT * FROM income_sources");
+$income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 検索条件を取得
+$search_income_source_id = $_GET['income_source_id'] ?? null;
+$search_start_date = $_GET['start_date'] ?? null;
+$search_end_date = $_GET['end_date'] ?? null;
+
+// 収入情報を取得（条件に応じて）
+$sql = "SELECT incomes.*, income_sources.name AS income_source_name FROM incomes INNER JOIN income_sources ON incomes.income_source_id = income_sources.id";
+$params = [];
+
+if (!empty($search_income_source_id)) {
+  $sql .= " WHERE incomes.income_source_id = ?";
+  $params[] = $search_income_source_id;
+}
+
+if (!empty($search_start_date)) {
+  $sql .= (empty($params) ? " WHERE" : " AND") . " incomes.accrual_date >= ?";
+  $params[] = $search_start_date;
+}
+
+if (!empty($search_end_date)) {
+  $sql .= (empty($params) ? " WHERE" : " AND") . " incomes.accrual_date <= ?";
+  $params[] = $search_end_date;
+}
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 合計を出す処理
+$total_income = 0;
+foreach ($incomes as $income) {
+    $total_income += $income['amount'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -12,7 +55,7 @@
       <nav>
         <ul class="flex justify-between">
           <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
-          <li><a class="text-white hover:text-blue-800" href="incomes/index.php">収入TOP</a></li>
+          <li><a class="text-white hover:text-blue-800" href="#">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">支出TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">ログイン</a></li>
         </ul>
@@ -23,7 +66,7 @@
       <h1 class="text-3xl mb-4 text-center">収入</h1>
       <!-- 合計額 -->
       <div class="text-right mt-4">
-        <span>合計: </span><span id="total-income">0</span><span> 円</span>
+        <span>合計: </span><span id="total-income"><?php echo $total_income; ?></span><span> 円</span>
       </div>
 
       <!-- 新規作成ボタン -->
@@ -31,23 +74,27 @@
         <a href="create.php" class="inline-block p-2 bg-green-500 text-white">収入を登録する</a>
       </div>
 
-      <!-- 検索バー -->
-      <div class="flex flex-col items-center mb-4">
+    <!-- 検索バー -->
+    <form action="index.php" method="GET">
+      <div class="flex flex-col items-center mb-8">
         <p class="mb-2">絞り込み検索</p>
         <div class="flex items-center">
-          <span class="mr-2">収入源：</span>
-          <select id="income-source" class="mr-2 p-2">
-            <option value="">すべてのカテゴリ</option>
-            <option value="給与">給与</option>
-            <option value="賞与">賞与</option>
-            <!-- 他の収入源 -->
+          <label for="income-source" class="mr-5 flex-shrink-0">収入源：</label>
+          <select id="income-source" name="income_source_id" class="mt-1 p-2 w-1/2">
+              <option value="">選択してください</option>
+              <?php foreach ($income_sources as $income_source): ?>
+                <option value="<?php echo $income_source['id']; ?>">
+              <?php echo htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
           </select>
-          <input type="date" id="start-date" class="mr-2 p-2">
+          <input type="date" name="start_date" id="start-date" class="mr-2 p-2">
           <span class="align-middle">〜</span>
-          <input type="date" id="end-date" class="mr-2 p-2">
-          <button id="search-button" class="p-2 bg-blue-500 text-white">検索</button>
+          <input type="date" name="end_date" id="end-date" class="mr-2 p-2">
+          <button type="submit" id="search-button" class="p-2 bg-blue-500 text-white">検索</button>
         </div>
       </div>
+    </form>
 
       <!-- 収入テーブル -->
       <table class="mx-auto w-full border-collapse border">
@@ -61,8 +108,16 @@
           </tr>
         </thead>
         <tbody>
-          <!-- ここにデータ -->
-        </tbody>
+        <?php foreach ($incomes as $income): ?>
+          <tr>
+            <td class="border px-4 py-2"><?php echo htmlspecialchars($income['income_source_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="border px-4 py-2"><?php echo htmlspecialchars($income['amount'], ENT_QUOTES, 'UTF-8'); ?>円</td>
+            <td class="border px-4 py-2"><?php echo htmlspecialchars($income['accrual_date'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="border px-4 py-2"><a href="edit.php?id=<?php echo $income['id']; ?>" class="p-2 bg-blue-500 text-white">編集</a></td>
+            <td class="border px-4 py-2"><a href="delete.php?id=<?php echo $income['id']; ?>" class="p-2 bg-red-500 text-white">削除</a></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
       </table>
 
     </div>
