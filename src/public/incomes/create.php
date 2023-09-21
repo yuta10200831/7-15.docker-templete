@@ -1,15 +1,7 @@
 <?php
-
 $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-$stmt = $pdo->query("SELECT * FROM spendings");
+$stmt = $pdo->query("SELECT * FROM income_sources");
 $income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// カテゴリデータを取得
-$category_sql = "SELECT * FROM categories";
-$category_stmt = $pdo->query($category_sql);
-$categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 ?>
 
 
@@ -23,20 +15,8 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="bg-gray-100 flex justify-center">
 
   <div class="mx-auto my-8 w-3/5">
-    <!-- ヘッダーの表示 -->
-    <header class="bg-blue-500 p-4">
-      <nav>
-        <ul class="flex justify-between">
-          <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
-          <li><a class="text-white hover:text-blue-800" href="incomes/index.php">収入TOP</a></li>
-          <li><a class="text-white hover:text-blue-800" href="index.php">支出TOP</a></li>
-          <li><a class="text-white hover:text-blue-800" href="#">ログイン</a></li>
-        </ul>
-      </nav>
-    </header>
-
     <div class="container p-4 bg-white rounded shadow-lg">
-      <h1 class="text-3xl mb-4 text-center">支出登録</h1>
+      <h1 class="text-3xl mb-4 text-center">収入登録</h1>
 
       <?php if (isset($_GET['error'])): ?>
       <div class="bg-red-500 text-white p-4 mb-4">
@@ -49,23 +29,17 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
       <?php endif; ?>
 
       <form action="store.php" method="POST">
-
-        <div class="mb-4 flex items-center">
-          <label for="name" class="block text-sm font-medium text-gray-600">支出名</label>
-          <input type="text" id="name" name="name" class="mt-1 p-2 w-1/3">
-        </div>
-
         <div class="mb-4">
-          <label for="categories" class="block text-sm font-medium text-gray-600">カテゴリー：</label>
-          <select id="categories" name="category_id" class="mt-1 p-2 w-1/2">
+          <label for="income-source" class="block text-sm font-medium text-gray-600">収入源</label>
+          <select id="income-source" name="income_source_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
-              <?php foreach ($categories as $category): ?>
-                <option value="<?php echo $category['id']; ?>">
-              <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+              <?php foreach ($income_sources as $income_source): ?>
+                <option value="<?php echo $income_source['id']; ?>">
+              <?php echo htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8'); ?>
               </option>
             <?php endforeach; ?>
           </select>
-            <a href="category/index.php" class="ml-4 p-2 bg-green-500 text-white">カテゴリ一覧へ</a>
+            <a href="income_sources/index.php" class="ml-4 p-2 bg-green-500 text-white">収入源一覧へ</a>
         </div>
 
         <div class="mb-4 flex items-center">

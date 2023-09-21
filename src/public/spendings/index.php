@@ -140,6 +140,7 @@ foreach ($spendings as $spending) {
               </form>
             </td>
             </tr>
+
             </tr>
           <?php endforeach; ?>
         </tbody>
