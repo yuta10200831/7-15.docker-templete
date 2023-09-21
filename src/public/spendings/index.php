@@ -123,8 +123,24 @@ foreach ($spendings as $spending) {
               <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['category_name'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['amount'], ENT_QUOTES, 'UTF-8'); ?></td>
               <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['accrual_date'], ENT_QUOTES, 'UTF-8'); ?></td>
-              <td class="border px-4 py-2"><a href="#">編集</a></td>
-              <td class="border px-4 py-2"><a href="#">削除</a></td>
+              <td class="border px-4 py-2">
+            <form action="edit.php" method="GET">
+              <input type="hidden" name="id" value="<?php echo $spending['id']; ?>">
+              <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                編集
+              </button>
+            </form>
+            </td>
+            <td class="border px-4 py-2">
+              <form action="delete.php" method="GET">
+                <input type="hidden" name="id" value="<?php echo $spending['id']; ?>">
+                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                  削除
+                </button>
+              </form>
+            </td>
+            </tr>
+
             </tr>
           <?php endforeach; ?>
         </tbody>
