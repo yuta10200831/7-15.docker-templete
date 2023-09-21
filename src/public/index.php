@@ -5,6 +5,7 @@
   <title>トップページ</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100">
   <div class="mx-auto my-8 w-4/5">
     <header class="bg-blue-500 p-4">
@@ -14,7 +15,7 @@
             <a class="text-white hover:text-blue-800" href="/">HOME</a>
           </li>
           <li>
-            <a class="text-white hover:text-blue-800" href="#">収入TOP</a>
+            <a class="text-white hover:text-blue-800" href="incomes/index.php">収入TOP</a>
           </li>
           <li>
             <a class="text-white hover:text-blue-800" href="spendings/index.php">支出TOP</a>
@@ -25,6 +26,7 @@
         </ul>
       </nav>
     </header>
+
     <main class="p-4">
       <div class="text-center my-8">
         <h1 class="text-4xl mb-4">家計簿アプリ</h1>
