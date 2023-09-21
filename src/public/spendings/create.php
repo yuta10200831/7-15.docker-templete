@@ -1,8 +1,15 @@
 <?php
 
 $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-$stmt = $pdo->query("SELECT * FROM categories");
-$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $pdo->query("SELECT * FROM spendings");
+$income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// カテゴリデータを取得
+$category_sql = "SELECT * FROM categories";
+$category_stmt = $pdo->query($category_sql);
+$categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 ?>
 
 
@@ -49,8 +56,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <div class="mb-4">
-          <label for="income-source" class="block text-sm font-medium text-gray-600">カテゴリー：</label>
-          <select id="income-source" name="category_id" class="mt-1 p-2 w-1/2">
+          <label for="categories" class="block text-sm font-medium text-gray-600">カテゴリー：</label>
+          <select id="categories" name="category_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
               <?php foreach ($categories as $category): ?>
                 <option value="<?php echo $category['id']; ?>">
