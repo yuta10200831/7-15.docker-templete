@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // DB接続
 $pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
 
@@ -23,7 +25,13 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
           <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="/spendings/index.php">支出TOP</a></li>
-          <li><a class="text-white hover:text-blue-800" href="#">ログイン</a></li>
+          <li>
+            <?php if (isset($_SESSION['username'])): ?>
+              <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
+            <?php else: ?>
+              <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
+            <?php endif; ?>
+          </li>
         </ul>
       </nav>
     </header>
