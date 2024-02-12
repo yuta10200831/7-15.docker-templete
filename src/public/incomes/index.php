@@ -56,7 +56,7 @@ foreach ($incomes as $income) {
         <ul class="flex justify-between">
           <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">収入TOP</a></li>
-          <li><a class="text-white hover:text-blue-800" href="#">支出TOP</a></li>
+          <li><a class="text-white hover:text-blue-800" href="/spendings/index.php">支出TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">ログイン</a></li>
         </ul>
       </nav>
