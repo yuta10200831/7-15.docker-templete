@@ -40,11 +40,13 @@ foreach ($data as $row) {
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>トップページ</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100">
   <div class="mx-auto my-8 w-4/5">
     <header class="bg-blue-500 p-4">
@@ -54,16 +56,21 @@ foreach ($data as $row) {
           <li><a class="text-white hover:text-blue-800" href="incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="spendings/index.php">支出TOP</a></li>
           <li>
-            <?php if (isset($_SESSION['username'])): ?>
-              <a class="text-white hover:text-blue-800" href="user/logout.php">ログアウト</a>
+            <?php if (isset($_SESSION['user']['name'])): ?>
+            <a class="text-white hover:text-blue-800" href="user/logout.php">ログアウト</a>
             <?php else: ?>
-              <a class="text-white hover:text-blue-800" href="user/signin.php">ログイン</a>
+            <a class="text-white hover:text-blue-800" href="user/signin.php">ログイン</a>
             <?php endif; ?>
           </li>
         </ul>
       </nav>
     </header>
     <main class="p-4">
+      <?php if (isset($_SESSION['user']['name'])): ?>
+      <div class="text-center my-4">
+        <h2 class="text-2xl text-blue-500">こんにちは、<?php echo htmlspecialchars($_SESSION['user']['name']); ?>さん</h2>
+      </div>
+      <?php endif; ?>
       <div class="text-center my-8">
         <h1 class="text-4xl mb-4">家計簿アプリ</h1>
       </div>
@@ -89,16 +96,18 @@ foreach ($data as $row) {
         </thead>
         <tbody>
           <?php foreach ($fixed_data as $row): ?>
-            <tr class="hover:bg-gray-100">
-              <td class="border px-4 py-2 text-center"><?php echo $row['month']; ?></td>
-              <td class="border px-4 py-2 text-center"><?php echo number_format($row['total_income']); ?>円</td>
-              <td class="border px-4 py-2 text-center"><?php echo number_format($row['total_spend']); ?>円</td>
-              <td class="border px-4 py-2 text-center"><?php echo number_format($row['total_income'] - $row['total_spend']); ?>円</td>
-            </tr>
+          <tr class="hover:bg-gray-100">
+            <td class="border px-4 py-2 text-center"><?php echo $row['month']; ?></td>
+            <td class="border px-4 py-2 text-center"><?php echo number_format($row['total_income']); ?>円</td>
+            <td class="border px-4 py-2 text-center"><?php echo number_format($row['total_spend']); ?>円</td>
+            <td class="border px-4 py-2 text-center">
+              <?php echo number_format($row['total_income'] - $row['total_spend']); ?>円</td>
+          </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
     </main>
   </div>
 </body>
+
 </html>
