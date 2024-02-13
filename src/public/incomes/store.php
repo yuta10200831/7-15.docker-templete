@@ -1,37 +1,48 @@
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-// エラーメッセージを保存する配列
-$error_messages = [];
+use App\Domain\ValueObject\incomes\incomesSourceId;
+use App\Domain\ValueObject\incomes\Amount;
+use App\Domain\ValueObject\incomes\AccrualDate;
+use App\UseCase\UseCaseInput\RegisterincomesInput;
+use App\UseCase\UseCaseInteractor\RegisterincomesInteractor;
+use App\Infrastructure\Redirect\Redirect;
+use App\Adapter\Repository\incomesRepository;
+use App\Infrastructure\Dao\incomesDao;
 
-// POSTで送られてきたデータを取得
-$income_source_id = $_POST['income_source_id'] ?? null;
-$amount = $_POST['amount'] ?? null;
-$accrual_date = $_POST['accrual_date'] ?? null;
+session_start();
 
-// バリデーション
-if (empty($income_source_id)) $error_messages[] = "収入源が選択されていません";
-if (empty($amount)) $error_messages[] = "金額が入力されていません";
-if (empty($accrual_date)) $error_messages[] = "日付が選択されていません";
+$incomesSourceId = filter_input(INPUT_POST, 'incomesSourceId');
+$amount = filter_input(INPUT_POST, 'amount');
+$accrualDate = filter_input(INPUT_POST, 'accrualDate');
 
-// エラーがあればリダイレクトして終了
-if (!empty($error_messages)) {
-  header("Location: create.php?error=" . urlencode(implode(', ', $error_messages)));
-  exit;
+if (empty($incomesSourceId) || empty($amount) || empty($accrualDate)) {
+    $_SESSION['error_message'] = '必要な情報をすべて入力してください。';
+    Redirect::handler('create.php');
+    exit;
 }
 
-// DB接続
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
+try {
+    $incomesSourceIdObj = new incomessSourceId($incomesSourceId);
+    $amountObj = new Amount($amount);
+    $accrualDateObj = new AccrualDate($accrualDate);
 
-// DBへの保存
-$stmt = $pdo->prepare("INSERT INTO incomes (user_id, income_source_id, amount, accrual_date) VALUES (0, ?, ?, ?)");
-$result = $stmt->execute([$income_source_id, $amount, $accrual_date]);
+    $input = new incomessInput($incomesSourceIdObj, $amountObj, $accrualDateObj);
+    $incomesDao = new incomessDao();
+    $repository = new incomessRepository($incomesDao);
+    $incomesInteractor = new incomessInteractor($input, $repository);
+    $output = $incomesInteractor->handle();
 
-// 保存失敗した場合リダイレクトして終了
-if (!$result) {
-  header("Location: create.php?error=登録失敗");
-  exit;
+    if (!$output->isSuccess()) {
+        $_SESSION['error_message'] = $output->getMessage();
+        Redirect::handler('create.php');
+        exit;
+    }
+
+    $_SESSION['message'] = $output->getMessage();
+    Redirect::handler('index.php');
+} catch (Exception $e) {
+    $_SESSION['error_message'] = $e->getMessage();
+    Redirect::handler('create.php');
+    exit;
 }
-
-// 保存成功
-header("Location: index.php");
-exit;
