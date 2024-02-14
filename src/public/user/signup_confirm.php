@@ -1,18 +1,18 @@
 <?php
 session_start();
 
-$name = $_POST['name'] ?? null;
-$email = $_POST['email'] ?? null;
-$password = $_POST['password'] ?? null;
-$password_confirm = $_POST['password_confirm'] ?? null;
+$name = filter_input(INPUT_POST, 'name');
+$email = filter_input(INPUT_POST, 'email');
+$password = filter_input(INPUT_POST, 'password');
+$confirmPassword = filter_input(INPUT_POST, 'confirmPassword');
 
-if (!$name || !$email || !$password || !$password_confirm) {
+if (!$name || !$email || !$password || !$confirmPassword) {
   $_SESSION['error_message'] = 'EmailかPasswordの入力がありません';
   header('Location: signup.php');
   exit;
 }
 
-if ($password !== $password_confirm) {
+if ($password !== $confirmPassword) {
   $_SESSION['error_message'] = 'パスワードが一致しません';
   header('Location: signup.php');
   exit;
@@ -21,9 +21,11 @@ if ($password !== $password_confirm) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>登録確認</title>
 </head>
+
 <body>
   <h1>以下の内容で登録してよろしいですか？</h1>
   <p>ユーザー名: <?php echo htmlspecialchars($name); ?></p>
@@ -35,8 +37,9 @@ if ($password !== $password_confirm) {
     <input type="hidden" name="name" value="<?php echo htmlspecialchars($name); ?>">
     <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
     <input type="hidden" name="password" value="<?php echo htmlspecialchars($password); ?>">
-    <input type="hidden" name="password_confirm" value="<?php echo htmlspecialchars($password_confirm); ?>">
+    <input type="hidden" name="confirmPassword" value="<?php echo htmlspecialchars($confirmPassword); ?>">
     <input type="submit" value="確認して登録">
   </form>
 </body>
+
 </html>
