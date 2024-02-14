@@ -1,5 +1,11 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use App\Infrastructure\Dao\IncomesDao;
+
+$incomesDao = new IncomesDao();
+$income_sources = $incomesDao->fetchIncomeSources();
 
 $error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : null;
 unset($_SESSION['error_message']);

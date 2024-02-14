@@ -1,6 +1,6 @@
 <?php
 
-namespace App\UseCase\Income\Outputs;
+namespace App\UseCase\UseCaseOutput;
 
 class IncomesOutput {
     private $success;

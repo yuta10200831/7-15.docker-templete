@@ -2,24 +2,17 @@
 
 namespace App\Domain\Entity;
 
-class Income
+class Incomes
 {
-    private $userId;
     private $incomeSourceId;
     private $amount;
     private $accrualDate;
 
-    public function __construct($userId, $incomeSourceId, $amount, $accrualDate)
+    public function __construct($incomeSourceId, $amount, $accrualDate)
     {
-        $this->userId = $userId;
         $this->incomeSourceId = $incomeSourceId;
         $this->amount = $amount;
         $this->accrualDate = $accrualDate;
-    }
-
-    public function getUserId()
-    {
-        return $this->userId;
     }
 
     public function getIncomeSourceId()

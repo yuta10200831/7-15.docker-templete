@@ -10,7 +10,7 @@ final class UserId
     public function __construct(int $value)
     {
         if ($this->isInvalid($value)) {
-            throw new Exception('不正な値です');
+            throw new \Exception('UserIdが不正な値です');
         }
         $this->value = $value;
     }

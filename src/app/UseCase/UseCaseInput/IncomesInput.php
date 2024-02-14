@@ -1,35 +1,27 @@
 <?php
 
-namespace App\Application\UseCase\Input;
+namespace App\UseCase\UseCaseInput;
 
-use App\Domain\ValueObject\UserId;
-use App\Domain\ValueObject\IncomeSourceId;
-use App\Domain\ValueObject\Amount;
-use App\Domain\ValueObject\AccrualDate;
+use App\Domain\ValueObject\Incomes\IncomesSourceId;
+use App\Domain\ValueObject\Incomes\Amount;
+use App\Domain\ValueObject\Incomes\AccrualDate;
 
 class IncomesInput
 {
-    private $userId;
-    private $incomeSourceId;
+    private $incomesSourceId;
     private $amount;
     private $accrualDate;
 
-    public function __construct(UserId $userId, IncomeSourceId $incomeSourceId, Amount $amount, AccrualDate $accrualDate)
+    public function __construct(IncomesSourceId $incomesSourceId, Amount $amount, AccrualDate $accrualDate)
     {
-        $this->userId = $userId;
-        $this->incomeSourceId = $incomeSourceId;
+        $this->incomesSourceId = $incomesSourceId;
         $this->amount = $amount;
         $this->accrualDate = $accrualDate;
     }
 
-    public function getUserId(): UserId
+    public function getIncomesSourceId(): IncomesSourceId
     {
-        return $this->userId;
-    }
-
-    public function getIncomeSourceId(): IncomeSourceId
-    {
-        return $this->incomeSourceId;
+        return $this->incomesSourceId;
     }
 
     public function getAmount(): Amount

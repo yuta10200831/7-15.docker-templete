@@ -2,7 +2,7 @@
 
 namespace App\Domain\ValueObject\Incomes;
 
-class IncomeSourceId
+class IncomesSourceId
 {
     private $value;
 

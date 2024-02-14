@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Application\Port;
+namespace App\Domain\Port;
 
-use App\Domain\Entity\Income;
+use App\Domain\Entity\Incomes;
 
 interface IIncomesCommand
 {
-    public function saveIncome(Incomes $income): void;
+    public function save(Incomes $income): void;
 }
