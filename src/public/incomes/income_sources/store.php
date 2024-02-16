@@ -1,36 +1,35 @@
 <?php
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+use App\Domain\ValueObject\Incomes\IncomeSourcesName;
+use App\UseCase\UseCaseInput\IncomeSourcesInput;
+use App\UseCase\UseCaseInteractor\IncomeSourcesInteractor;
+use App\Infrastructure\Redirect\Redirect;
+use App\Adapter\Repository\IncomeSourcesRepository;
+use App\Infrastructure\Dao\IncomeSourcesDao;
 
 session_start();
-$error_messages = [];
 
-$income_source = $_POST['income_source'] ?? '';
+$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
 
-// バリデーション
-if (empty($income_source)) {
-    $error_messages[] = "収入源が入力されていません";
-}
+try {
+    $incomeSourcesName = new IncomeSourcesName($name);
+    $incomeSourcesInput = new IncomeSourcesInput($incomeSourcesName);
+    $incomeSourcesDao = new IncomeSourcesDao();
+    $repository = new IncomeSourcesRepository($incomeSourcesDao);
+    $interactor = new IncomeSourcesInteractor($repository, $incomeSourcesInput);
+    $output = $interactor->handle();
 
-if (!empty($error_messages)) {
-    $_SESSION['error'] = implode(', ', $error_messages);
-    header('Location: create.php');
+    if (!$output->isSuccess()) {
+        $_SESSION['error_message'] = $output->getMessage();
+        Redirect::handler('create.php');
+        exit;
+    }
+
+    $_SESSION['message'] = $output->getMessage();
+    Redirect::handler('index.php');
+} catch (\Exception $e) {
+    $_SESSION['error_message'] = '収入源の登録に失敗しました: ' . $e->getMessage();
+    Redirect::handler('create.php');
     exit;
 }
-
-// DB接続
-$pdo = new PDO('mysql:host=mysql;dbname=kakeibo;charset=utf8', 'root', 'password');
-
-// SQL文でデータを挿入
-$stmt = $pdo->prepare("INSERT INTO income_sources (user_id, name) VALUES (0, :name)");
-$stmt->bindParam(':name', $income_source, PDO::PARAM_STR);
-
-// SQL実行
-if (!$stmt->execute()) {
-    $_SESSION['error'] = "エラーが発生しました";
-    header('Location: create.php');
-    exit;
-}
-
-// 成功時の処理（エラーメッセージをクリア）
-unset($_SESSION['error']);
-header('Location: index.php');
-exit;
