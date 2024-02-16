@@ -1,47 +1,43 @@
 <?php
 
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+use App\Domain\ValueObject\Spendings\CategoryName;
+use App\UseCase\UseCaseInput\CategoryInput;
+use App\UseCase\UseCaseInteractor\CategoryInteractor;
+use App\Adapter\Repository\CategoryRepository;
+use App\Infrastructure\Dao\CategoryDao;
+use App\Infrastructure\Redirect\Redirect;
+
 session_start();
-$error_messages = [];
 
-$categories = $_POST['categories'] ?? '';
+$categoryNameInput = $_POST['categoryName'] ?? '';
 
-// バリデーション
-if (empty($categories)) {
-    $error_messages[] = "カテゴリ名が入力されていません";
-}
-
-// DB接続
-$pdo = new PDO('mysql:host=mysql;dbname=kakeibo;charset=utf8', 'root', 'password');
-
-// 既に存在するカテゴリかどうかをチェック
-$checkStmt = $pdo->prepare("SELECT * FROM categories WHERE name = :name");
-$checkStmt->bindParam(':name', $categories, PDO::PARAM_STR);
-$checkStmt->execute();
-
-// カテゴリが既に存在する場合はエラーメッセージを設定
-if ($checkStmt->fetch()) {
-    $error_messages[] = "既に登録済みのカテゴリです";
-}
-
-// エラーメッセージが存在する場合はセッションに保存してリダイレクト
-if (!empty($error_messages)) {
-    $_SESSION['error'] = implode(', ', $error_messages);
-    header('Location: create.php');
+if (empty($categoryNameInput)) {
+    $_SESSION['error_message'] = "カテゴリ名が入力されていません。";
+    Redirect::handler('create.php');
     exit;
 }
 
-// SQL文でデータを挿入
-$stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (0, :name)");
-$stmt->bindParam(':name', $categories, PDO::PARAM_STR);
+try {
+    $categoryName = new CategoryName($categoryNameInput);
+    $input = new CategoryInput($categoryName);
+    $categoryDao = new CategoryDao();
+    $repository = new CategoryRepository($categoryDao);
+    $interactor = new CategoryInteractor($repository, $input);
 
-// SQL実行
-if (!$stmt->execute()) {
-    $_SESSION['error'] = "エラーが発生しました";
-    header('Location: create.php');
+    $output = $interactor->handle();
+
+    if (!$output->isSuccess()) {
+        $_SESSION['error_message'] = $output->getMessage();
+        Redirect::handler('create.php');
+        exit;
+    }
+
+    $_SESSION['message'] = $output->getMessage();
+    Redirect::handler('index.php');
+} catch (\Exception $e) {
+    $_SESSION['error_message'] = "処理中にエラーが発生しました: " . $e->getMessage();
+    Redirect::handler('create.php');
     exit;
 }
-
-// 成功時の処理（エラーメッセージをクリア）
-unset($_SESSION['error']);
-header('Location: index.php');
-exit;
