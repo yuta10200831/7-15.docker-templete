@@ -11,11 +11,13 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>カテゴリ一覧</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex justify-center">
   <div class="w-3/5">
     <!-- ヘッダーの表示 -->
@@ -26,10 +28,10 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="/spendings/index.php">支出TOP</a></li>
           <li>
-            <?php if (isset($_SESSION['username'])): ?>
-              <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
+            <?php if (isset($_SESSION['user']['name'])): ?>
+            <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
             <?php else: ?>
-              <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
+            <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
             <?php endif; ?>
           </li>
         </ul>
@@ -55,7 +57,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tr>
           </thead>
           <tbody>
-          <?php
+            <?php
             foreach ($categories as $category) {
               echo '<tr>';
               echo '<td class="border px-4 py-2">' . htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') . '</td>';
@@ -75,4 +77,5 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 </body>
+
 </html>

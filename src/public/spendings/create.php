@@ -16,11 +16,13 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>収入を登録</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex justify-center">
 
   <div class="mx-auto my-8 w-3/5">
@@ -33,9 +35,9 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
           <li><a class="text-white hover:text-blue-800" href="index.php">支出TOP</a></li>
           <li>
             <?php if (isset($_SESSION['username'])): ?>
-              <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
+            <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
             <?php else: ?>
-              <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
+            <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
             <?php endif; ?>
           </li>
         </ul>
@@ -49,7 +51,7 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
       <div class="bg-red-500 text-white p-4 mb-4">
         <ul>
           <?php foreach (explode(', ', $_GET['error']) as $error): ?>
-            <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+          <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
           <?php endforeach; ?>
         </ul>
       </div>
@@ -65,14 +67,14 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="mb-4">
           <label for="categories" class="block text-sm font-medium text-gray-600">カテゴリー：</label>
           <select id="categories" name="category_id" class="mt-1 p-2 w-1/2">
-              <option value="">選択してください</option>
-              <?php foreach ($categories as $category): ?>
-                <option value="<?php echo $category['id']; ?>">
+            <option value="">選択してください</option>
+            <?php foreach ($categories as $category): ?>
+            <option value="<?php echo $category['id']; ?>">
               <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
-              </option>
+            </option>
             <?php endforeach; ?>
           </select>
-            <a href="category/index.php" class="ml-4 p-2 bg-green-500 text-white">カテゴリ一覧へ</a>
+          <a href="category/index.php" class="ml-4 p-2 bg-green-500 text-white">カテゴリ一覧へ</a>
         </div>
 
         <div class="mb-4 flex items-center">
@@ -95,4 +97,5 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </div>
 </body>
+
 </html>
