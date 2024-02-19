@@ -1,39 +1,47 @@
 <?php
 
-// エラーメッセージを保存する配列
-$error_messages = [];
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-// POSTで送られてきたデータを取得
-$name = $_POST['name'] ?? null;
-$category_id = $_POST['category_id'] ?? null;
-$amount = $_POST['amount'] ?? null;
-$accrual_date = $_POST['accrual_date'] ?? null;
+use App\Domain\ValueObject\Spendings\SpendingsName;
+use App\Domain\ValueObject\Spendings\CategoryId;
+use App\Domain\ValueObject\Incomes\Amount;
+use App\Domain\ValueObject\Incomes\AccrualDate;
+use App\UseCase\UseCaseInput\SpendingsInput;
+use App\UseCase\UseCaseInteractor\SpendingsInteractor;
+use App\Adapter\Repository\SpendingsRepository;
+use App\Infrastructure\Dao\SpendingsDao;
+use App\Infrastructure\Redirect\Redirect;
 
-// バリデーション
-if (empty($name)) $error_messages[] = "支出名が入力されていません";
-if (empty($category_id)) $error_messages[] = "カテゴリーが選択されていません";
-if (empty($amount)) $error_messages[] = "金額が入力されていません";
-if (empty($accrual_date)) $error_messages[] = "日付が選択されていません";
+session_start();
 
-// エラーがあればリダイレクトして終了
-if (!empty($error_messages)) {
-  header("Location: create.php?error=" . urlencode(implode(', ', $error_messages)));
-  exit;
+$spendingsName = filter_input(INPUT_POST, 'name');
+$category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+$amount = filter_input(INPUT_POST, 'amount');
+$accrualDate = filter_input(INPUT_POST, 'accrual_date');
+
+try {
+    $spendingsNameVo = new SpendingsName($spendingsName);
+    $categoryIdVo = new CategoryId($category_id);
+    $amountVo = new Amount(floatval($amount));
+    $accrualDateVo = new AccrualDate($accrualDate);
+
+    $input = new SpendingsInput($spendingsNameVo, $categoryIdVo, $amountVo, $accrualDateVo);
+    $spendingsDao = new SpendingsDao();
+    $repository = new SpendingsRepository($spendingsDao);
+    $interactor = new SpendingsInteractor($repository, $input);
+
+    $output = $interactor->handle();
+
+    if (!$output->isSuccess()) {
+        $_SESSION['error_message'] = $output->getMessage();
+        Redirect::handler('create.php');
+        exit;
+    }
+
+    $_SESSION['message'] = $output->getMessage();
+    Redirect::handler('index.php');
+} catch (\Exception $e) {
+    $_SESSION['error_message'] = "処理中にエラーが発生しました: " . $e->getMessage();
+    Redirect::handler('create.php');
+    exit;
 }
-
-// DB接続
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-
-// DBへの保存
-$stmt = $pdo->prepare("INSERT INTO spendings (user_id, name, category_id, amount, accrual_date) VALUES (?, ?, ?, ?, ?)");
-$result = $stmt->execute([0, $name, $category_id, $amount, $accrual_date]);
-
-// 保存失敗した場合リダイレクトして終了
-if (!$result) {
-  header("Location: create.php?error=登録失敗");
-  exit;
-}
-
-// 保存成功
-header("Location: index.php");
-exit;

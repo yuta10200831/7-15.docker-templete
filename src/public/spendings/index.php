@@ -51,11 +51,13 @@ foreach ($spendings as $spending) {
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>収入一覧</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex justify-center">
   <div class="mx-auto my-8 w-4/5">
     <!-- ヘッダーの表示 -->
@@ -66,10 +68,10 @@ foreach ($spendings as $spending) {
           <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="#">支出TOP</a></li>
           <li>
-            <?php if (isset($_SESSION['username'])): ?>
-              <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
+            <?php if (isset($_SESSION['user']['name'])): ?>
+            <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
             <?php else: ?>
-              <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
+            <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
             <?php endif; ?>
           </li>
         </ul>
@@ -77,11 +79,16 @@ foreach ($spendings as $spending) {
     </header>
 
     <div class="container p-4 bg-white rounded shadow-lg">
+      <?php if (isset($_SESSION['user']['name'])): ?>
+      <div class="text-center my-4">
+        <h2 class="text-2xl text-blue-500">こんにちは、<?php echo htmlspecialchars($_SESSION['user']['name']); ?>さん</h2>
+      </div>
+      <?php endif; ?>
       <h1 class="text-3xl mb-4 text-center">支出</h1>
 
       <!-- 合計額 -->
       <div class="text-right mt-4">
-      <span>合計: </span><span id="total-spendings"><?php echo $total_spendings; ?></span><span> 円</span>
+        <span>合計: </span><span id="total-spendings"><?php echo $total_spendings; ?></span><span> 円</span>
       </div>
 
       <!-- 新規作成ボタン -->
@@ -98,9 +105,9 @@ foreach ($spendings as $spending) {
             <select id="categories" name="category_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
               <?php foreach ($categories as $category): ?>
-                <option value="<?php echo $category['id']; ?>">
-                  <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
-                </option>
+              <option value="<?php echo $category['id']; ?>">
+                <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+              </option>
               <?php endforeach; ?>
             </select>
 
@@ -126,18 +133,20 @@ foreach ($spendings as $spending) {
         </thead>
         <tbody>
           <?php foreach ($spendings as $spending): ?>
-            <tr>
-              <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['name'], ENT_QUOTES, 'UTF-8'); ?></td>
-              <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['category_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-              <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['amount'], ENT_QUOTES, 'UTF-8'); ?></td>
-              <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['accrual_date'], ENT_QUOTES, 'UTF-8'); ?></td>
-              <td class="border px-4 py-2">
-            <form action="edit.php" method="GET">
-              <input type="hidden" name="id" value="<?php echo $spending['id']; ?>">
-              <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                編集
-              </button>
-            </form>
+          <tr>
+            <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['name'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="border px-4 py-2">
+              <?php echo htmlspecialchars($spending['category_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['amount'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="border px-4 py-2"><?php echo htmlspecialchars($spending['accrual_date'], ENT_QUOTES, 'UTF-8'); ?>
+            </td>
+            <td class="border px-4 py-2">
+              <form action="edit.php" method="GET">
+                <input type="hidden" name="id" value="<?php echo $spending['id']; ?>">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  編集
+                </button>
+              </form>
             </td>
             <td class="border px-4 py-2">
               <form action="delete.php" method="GET">
@@ -147,9 +156,9 @@ foreach ($spendings as $spending) {
                 </button>
               </form>
             </td>
-            </tr>
+          </tr>
 
-            </tr>
+          </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
@@ -157,4 +166,5 @@ foreach ($spendings as $spending) {
     </div>
   </div>
 </body>
+
 </html>
