@@ -31,4 +31,13 @@ class IncomeSourcesDao {
         }
     }
 
+    public function findAll(): array {
+        $sql = "SELECT user_id, name FROM income_sources";
+        $stmt = $this->pdo->query($sql);
+
+        if ($stmt === false) {
+            throw new Exception("クエリの実行に失敗しました。");
+        }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
