@@ -4,13 +4,15 @@ session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Adapter\QueryService\IndexQueryService;
-use App\Infrastructure\Dao\IndexDao;
+use App\Infrastructure\Dao\SpendingsDao;
+use App\Infrastructure\Dao\IncomesDao;
 
 $selected_year = $_GET['selected_year'] ?? date('Y');
 
 try {
-    $indexDao = new IndexDao();
-    $indexQueryService = new IndexQueryService($indexDao);
+    $spendingsDao = new SpendingsDao();
+    $incomesDao = new IncomesDao();
+    $indexQueryService = new IndexQueryService($spendingsDao, $incomesDao);
 
     $search_category_id = $_GET['category_id'] ?? null;
     $search_start_date = $_GET['start_date'] ?? null;
@@ -19,29 +21,30 @@ try {
     $spendings = $indexQueryService->getSpendingsWithFilter($selected_year, $search_category_id, $search_start_date, $search_end_date);
     $incomes = $indexQueryService->getIncomesWithFilter($selected_year, $search_category_id, $search_start_date, $search_end_date);
 
+    // 配列の各要素から 'amount' フィールドにアクセスして合計を計算
     $total_spendings = array_sum(array_map(function($spending) {
-        return $spending->getAmount();
+        return $spending['amount'];
     }, $spendings));
 
     $total_incomes = array_sum(array_map(function($income) {
-        return $income->getAmount();
+        return $income['amount'];
     }, $incomes));
 
     $fixed_data = [];
     foreach ($spendings as $spending) {
-        $month = $spending->getAccrualDate()->format('Y-m');
+        $month = (new DateTime($spending['accrual_date']))->format('Y-m');
         if (!isset($fixed_data[$month])) {
             $fixed_data[$month] = ['month' => $month, 'total_income' => 0, 'total_spend' => 0];
         }
-        $fixed_data[$month]['total_spend'] += $spending->getAmount();
+        $fixed_data[$month]['total_spend'] += $spending['amount'];
     }
 
     foreach ($incomes as $income) {
-        $month = $income->getAccrualDate()->format('Y-m');
+        $month = (new DateTime($income['accrual_date']))->format('Y-m');
         if (!isset($fixed_data[$month])) {
             $fixed_data[$month] = ['month' => $month, 'total_income' => 0, 'total_spend' => 0];
         }
-        $fixed_data[$month]['total_income'] += $income->getAmount();
+        $fixed_data[$month]['total_income'] += $income['amount'];
     }
 
 } catch (Exception $e) {
@@ -51,7 +54,6 @@ try {
 }
 
 ?>
-
 
 
 <!DOCTYPE html>
