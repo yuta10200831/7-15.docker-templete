@@ -21,7 +21,6 @@ try {
     $spendings = $indexQueryService->getSpendingsWithFilter($selected_year, $search_category_id, $search_start_date, $search_end_date);
     $incomes = $indexQueryService->getIncomesWithFilter($selected_year, $search_category_id, $search_start_date, $search_end_date);
 
-    // 配列の各要素から 'amount' フィールドにアクセスして合計を計算
     $total_spendings = array_sum(array_map(function($spending) {
         return $spending['amount'];
     }, $spendings));
@@ -95,6 +94,7 @@ try {
       <div class="my-4 flex justify-center items-center">
         <form action="index.php" method="get">
           <select name="selected_year" id="year-select" class="border rounded p-2 mr-4">
+            <option value="2024" <?php if($selected_year == "2024") echo "selected"; ?>>2024</option>
             <option value="2023" <?php if($selected_year == "2023") echo "selected"; ?>>2023</option>
             <option value="2022" <?php if($selected_year == "2022") echo "selected"; ?>>2022</option>
             <option value="2021" <?php if($selected_year == "2021") echo "selected"; ?>>2021</option>
