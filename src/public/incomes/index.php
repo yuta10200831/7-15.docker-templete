@@ -1,46 +1,27 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-// DB接続
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
+use App\Infrastructure\Dao\IncomesDao;
+use App\Adapter\QueryService\IncomesQueryService;
+use App\UseCase\UseCaseInput\IncomesReadInput;
+use App\UseCase\UseCaseInteractor\IncomesReadInteractor;
 
-// 収入源を取得
-$stmt = $pdo->query("SELECT * FROM income_sources");
-$income_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$incomesDao = new IncomesDao();
+$incomesQueryService = new IncomesQueryService($incomesDao);
 
 // 検索条件を取得
 $search_income_source_id = $_GET['income_source_id'] ?? null;
 $search_start_date = $_GET['start_date'] ?? null;
 $search_end_date = $_GET['end_date'] ?? null;
 
-// 収入情報を取得（条件に応じて）
-$sql = "SELECT incomes.*, income_sources.name AS income_source_name FROM incomes INNER JOIN income_sources ON incomes.income_source_id = income_sources.id";
-$params = [];
+$input = new IncomesReadInput($search_income_source_id, $search_start_date, $search_end_date);
 
-if (!empty($search_income_source_id)) {
-  $sql .= " WHERE incomes.income_source_id = ?";
-  $params[] = $search_income_source_id;
-}
+$incomesReadInteractor = new IncomesReadInteractor($incomesQueryService, $input);
+$output = $incomesReadInteractor->handle();
+$incomes = $output->getIncomes();
+$incomeSources = $incomesQueryService->fetchIncomeSources();
 
-if (!empty($search_start_date)) {
-  $sql .= (empty($params) ? " WHERE" : " AND") . " incomes.accrual_date >= ?";
-  $params[] = $search_start_date;
-}
-
-if (!empty($search_end_date)) {
-  $sql .= (empty($params) ? " WHERE" : " AND") . " incomes.accrual_date <= ?";
-  $params[] = $search_end_date;
-}
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// 合計を出す処理
-$total_income = 0;
-foreach ($incomes as $income) {
-    $total_income += $income['amount'];
-}
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +54,7 @@ foreach ($incomes as $income) {
     </header>
 
 
-    <div class="container p-4 bg-white rounded shadow-lg">
+    <div class="mx-auto my-8 w-4/5">
       <?php if (isset($_SESSION['user']['name'])): ?>
       <div class="text-center my-4">
         <h2 class="text-2xl text-blue-500">こんにちは、<?php echo htmlspecialchars($_SESSION['user']['name']); ?>さん</h2>
@@ -98,9 +79,9 @@ foreach ($incomes as $income) {
             <label for="income-source" class="mr-5 flex-shrink-0">収入源：</label>
             <select id="income-source" name="income_source_id" class="mt-1 p-2 w-1/2">
               <option value="">選択してください</option>
-              <?php foreach ($income_sources as $income_source): ?>
-              <option value="<?php echo $income_source['id']; ?>">
-                <?php echo htmlspecialchars($income_source['name'], ENT_QUOTES, 'UTF-8'); ?>
+              <?php foreach ($incomeSources as $incomeSource): ?>
+              <option value="<?php echo $incomeSource['id']; ?>">
+                <?php echo htmlspecialchars($incomeSource['name'], ENT_QUOTES, 'UTF-8'); ?>
               </option>
               <?php endforeach; ?>
             </select>
@@ -113,27 +94,29 @@ foreach ($incomes as $income) {
       </form>
 
       <!-- 収入テーブル -->
-      <table class="mx-auto w-full border-collapse border">
+      <table class="mx-auto w-full border-collapse border border-gray-200">
         <thead>
-          <tr>
-            <th class="border px-4 py-2">収入名</th>
-            <th class="border px-4 py-2">金額</th>
-            <th class="border px-4 py-2">日付</th>
-            <th class="border px-4 py-2">編集</th>
-            <th class="border px-4 py-2">削除</th>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-700 px-4 py-2">収入名</th>
+            <th class="border border-gray-700 px-4 py-2">金額</th>
+            <th class="border border-gray-700 px-4 py-2">日付</th>
+            <th class="border border-gray-700 px-4 py-2">編集</th>
+            <th class="border border-gray-700 px-4 py-2">削除</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($incomes as $income): ?>
           <tr>
-            <td class="border px-4 py-2">
+            <td class="border border-gray-200 px-4 py-2">
               <?php echo htmlspecialchars($income['income_source_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-            <td class="border px-4 py-2"><?php echo htmlspecialchars($income['amount'], ENT_QUOTES, 'UTF-8'); ?>円</td>
-            <td class="border px-4 py-2"><?php echo htmlspecialchars($income['accrual_date'], ENT_QUOTES, 'UTF-8'); ?>
+            <td class="border border-gray-200 px-4 py-2">
+              <?php echo htmlspecialchars($income['amount'], ENT_QUOTES, 'UTF-8'); ?>円</td>
+            <td class="border border-gray-200 px-4 py-2">
+              <?php echo htmlspecialchars($income['accrual_date'], ENT_QUOTES, 'UTF-8'); ?>
             </td>
-            <td class="border px-4 py-2"><a href="edit.php?id=<?php echo $income['id']; ?>"
+            <td class="border border-gray-200 px-4 py-2"><a href="edit.php?id=<?php echo $income['id']; ?>"
                 class="p-2 bg-blue-500 text-white">編集</a></td>
-            <td class="border px-4 py-2"><a href="delete.php?id=<?php echo $income['id']; ?>"
+            <td class="border border-gray-200 px-4 py-2"><a href="delete.php?id=<?php echo $income['id']; ?>"
                 class="p-2 bg-red-500 text-white">削除</a></td>
           </tr>
           <?php endforeach; ?>

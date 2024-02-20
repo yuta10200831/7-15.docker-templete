@@ -35,4 +35,25 @@ class IncomesDao {
         $stmt = $this->pdo->query("SELECT * FROM income_sources");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function fetchIncomesFiltered($incomeSourceId, $startDate, $endDate) {
+        $sql = "SELECT incomes.*, income_sources.name AS income_source_name FROM incomes";
+        $sql .= " JOIN income_sources ON incomes.income_source_id = income_sources.id WHERE 1=1";
+        $params = [];
+
+        if (!empty($incomeSourceId)) {
+            $sql .= " AND incomes.income_source_id = ?";
+            $params[] = $incomeSourceId;
+        }
+
+        if (!empty($startDate) && !empty($endDate)) {
+            $sql .= " AND incomes.accrual_date BETWEEN ? AND ?";
+            $params[] = $startDate;
+            $params[] = $endDate;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
