@@ -7,22 +7,26 @@ use App\Adapter\QueryService\IncomesQueryService;
 use App\UseCase\UseCaseInput\IncomesReadInput;
 use App\UseCase\UseCaseInteractor\IncomesReadInteractor;
 
-$incomesDao = new IncomesDao();
-$incomesQueryService = new IncomesQueryService($incomesDao);
-
 // 検索条件を取得
 $search_income_source_id = $_GET['income_source_id'] ?? null;
 $search_start_date = $_GET['start_date'] ?? null;
 $search_end_date = $_GET['end_date'] ?? null;
 
-$input = new IncomesReadInput($search_income_source_id, $search_start_date, $search_end_date);
-
-$incomesReadInteractor = new IncomesReadInteractor($incomesQueryService, $input);
-$output = $incomesReadInteractor->handle();
-$incomes = $output->getIncomes();
-$incomeSources = $incomesQueryService->fetchIncomeSources();
-
+try {
+    $incomesDao = new IncomesDao();
+    $incomesQueryService = new IncomesQueryService($incomesDao);
+    $input = new IncomesReadInput($search_income_source_id, $search_start_date, $search_end_date);
+    $incomesReadInteractor = new IncomesReadInteractor($incomesQueryService, $input);
+    $output = $incomesReadInteractor->handle();
+    $incomes = $output->getIncomes();
+    $incomeSources = $incomesQueryService->fetchIncomeSources();
+} catch (Exception $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+    header('Location: error.php');
+    exit;
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
