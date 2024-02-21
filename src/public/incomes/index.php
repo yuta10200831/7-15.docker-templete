@@ -8,9 +8,10 @@ use App\UseCase\UseCaseInput\IncomesReadInput;
 use App\UseCase\UseCaseInteractor\IncomesReadInteractor;
 
 // 検索条件を取得
-$search_income_source_id = $_GET['income_source_id'] ?? null;
-$search_start_date = $_GET['start_date'] ?? null;
-$search_end_date = $_GET['end_date'] ?? null;
+$search_income_source_id = isset($_GET['income_source_id']) && $_GET['income_source_id'] !== '' ? intval($_GET['income_source_id']) : null;
+$search_start_date = $_GET['start_date'] !== '' ? $_GET['start_date'] : null;
+$search_end_date = $_GET['end_date'] !== '' ? $_GET['end_date'] : null;
+
 
 try {
     $incomesDao = new IncomesDao();
