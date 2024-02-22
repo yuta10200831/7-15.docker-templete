@@ -2,43 +2,40 @@
 
 namespace App\Adapter\QueryService;
 
-use App\Infrastructure\Dao\IndexDao;
-use App\Domain\Entity\Incomes;
-use App\Domain\Entity\Spendings;
+use App\Infrastructure\Dao\SpendingsDao;
+use App\Infrastructure\Dao\IncomesDao;
 use App\Domain\Port\IIndexQuery;
 
 class IndexQueryService implements IIndexQuery {
-    private $indexDao;
+    private $spendingsDao;
+    private $incomesDao;
 
-    public function __construct(IndexDao $indexDao) {
-        $this->indexDao = $indexDao;
+    public function __construct(SpendingsDao $spendingsDao, IncomesDao $incomesDao) {
+        $this->spendingsDao = $spendingsDao;
+        $this->incomesDao = $incomesDao;
     }
 
     public function getMonthlySummary($year): array {
-        $summaryData = $this->indexDao->getMonthlySummary($year);
-        $incomesEntities = [];
+        $monthlySummary = [];
+        for ($month = 1; $month <= 12; $month++) {
+            $totalIncome = $this->incomesDao->getTotalIncomesByMonthAndYear($year, $month);
+            $totalSpend = $this->spendingsDao->getTotalSpendingsByMonthAndYear($year, $month);
 
-        foreach ($summaryData as $data) {
-            $incomesEntities[] = new Incomes(
-                $data['id'],
-                $data['user_id'],
-                $data['income_source_id'],
-                $data['amount'],
-                new \DateTime($data['accrual_date']),
-                new \DateTime($data['created_at']),
-                new \DateTime($data['updated_at'])
-            );
+            $monthlySummary[$month] = [
+                'month' => $month,
+                'total_income' => $totalIncome,
+                'total_spending' => $totalSpend,
+                'balance' => $totalIncome - $totalSpend,
+            ];
         }
-
-        return $incomesEntities;
+        return $monthlySummary;
     }
 
     public function getSpendingsWithFilter($year, $categoryId = null, $startDate = null, $endDate = null): array {
-        return $this->indexDao->fetchSpendingsWithFilter($year, $categoryId, $startDate, $endDate);
+        return $this->spendingsDao->fetchSpendingsWithFilter($year, $categoryId, $startDate, $endDate);
     }
 
     public function getIncomesWithFilter($year, $categoryId = null, $startDate = null, $endDate = null): array {
-      return $this->indexDao->fetchIncomesWithFilter($year, $categoryId, $startDate, $endDate);
-  }
-
+        return $this->incomesDao->fetchIncomesWithFilter($year, $categoryId, $startDate, $endDate);
+    }
 }
