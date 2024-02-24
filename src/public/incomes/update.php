@@ -24,19 +24,20 @@ if (is_null($id) || empty($amount) || empty($accrualDate) || empty($incomeSource
 }
 
 try {
-    $amountVO = new Amount((float)$amount);
-    $accrualDateVO = new AccrualDate($accrualDate);
-    $incomeSourceIdVO = new IncomesSourceId((int)$incomeSourceId);
-    $input = new IncomesEditInput($id, $amountVO, $accrualDateVO, $incomeSourceIdVO);
-    $incomesDao = new IncomesDao();
-    $incomesRepository = new IncomesRepository($incomesDao);
-    $incomesEditInteractor = new IncomesEditInteractor($incomesRepository, $input);
-    $output = $incomesEditInteractor->handle();
+  $amountVO = new Amount((float)$amount);
+  $accrualDateVO = new AccrualDate($accrualDate);
+  $incomeSourceIdVO = new IncomesSourceId((int)$incomeSourceId);
+  $input = new IncomesEditInput($id, $amountVO, $accrualDateVO, $incomeSourceIdVO);
+  $incomesDao = new IncomesDao();
+  $incomesRepository = new IncomesRepository($incomesDao);
+  $incomesEditInteractor = new IncomesEditInteractor($incomesRepository, $input);
+  $output = $incomesEditInteractor->handle();
 
-    header('Location: index.php');
-    exit;
+  $_SESSION['success'] = '収入情報が正常に更新されました。';
+  header('Location: index.php');
+  exit;
 } catch (Exception $e) {
-    $_SESSION['errors'] = $e->getMessage();
-    header("Location: edit.php?id=" . urlencode($id));
-    exit;
+  $_SESSION['errors'] = [$e->getMessage()];
+  header("Location: edit.php?id=" . urlencode($id));
+  exit;
 }
