@@ -40,4 +40,23 @@ class IncomeSourcesDao {
         }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function update(IncomeSources $incomeSources): void {
+        $stmt = $this->pdo->prepare("UPDATE income_sources SET name = :name WHERE id = :id");
+        $result = $stmt->execute([
+            ':name' => $incomeSources->getIncomeSourcesName(),
+            ':id' => $incomeSources->getId()
+        ]);
+
+        if (!$result) {
+            throw new Exception("収入源の更新に失敗しました。");
+        }
+    }
+
+    public function findById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM income_sources WHERE id = :id");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

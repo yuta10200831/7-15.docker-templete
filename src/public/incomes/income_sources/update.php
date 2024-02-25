@@ -1,31 +1,38 @@
 <?php
-session_start();  // セッション開始
+session_start();
 
-// POSTからデータを取得
-$id = $_POST['id'];
-$name = $_POST['name'];
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-// 名前のバリデーション
-if (empty($name)) {
-    $_SESSION['error_message'] = '収入源名が入力されていません。';
-    header('Location: edit.php?id=' . $id);
+use App\UseCase\UseCaseInput\IncomeSourcesEditInput;
+use App\UseCase\UseCaseInteractor\IncomeSourcesEditInteractor;
+use App\Infrastructure\Dao\IncomeSourcesDao;
+use App\Adapter\Repository\IncomeSourcesRepository;
+
+$id = $GET['id'] ?? null;
+$name = trim($GET['name'] ?? '');
+
+if ($id === null || $name === '') {
+    $_SESSION['error_message'] = 'IDと収入源名は必須です。';
+    header("Location: edit.php?id=" . urlencode($id));
     exit();
 }
 
-// POSTからデータを取得、確認
-if (!isset($_POST['id']) || !isset($_POST['name'])) {
-  header('Location: error.php');
-  exit();
+try {
+    $editInput = new IncomeSourcesEditInput($id, $name);
+    $incomeSourcesDao = new IncomeSourcesDao();
+    $repository = new IncomeSourcesRepository($incomeSourcesDao);
+    $editInteractor = new IncomeSourcesEditInteractor($repository, $editInput);
+    $result = $editInteractor->handle();
+
+    if ($result->isSuccess()) {
+        $_SESSION['success_message'] = $result->getMessage();
+        header('Location: index.php');
+        exit();
+    } else {
+        throw new Exception($result->getMessage());
+    }
+} catch (Exception $e) {
+    $_SESSION['error_message'] = '更新処理に失敗しました: ' . $e->getMessage();
+    header('Location: edit.php?id=' . urlencode($id));
+    exit();
 }
-
-// DB接続
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-
-// 更新処理
-$stmt = $pdo->prepare("UPDATE income_sources SET name = ? WHERE id = ?");
-$stmt->execute([$name, $id]);
-
-// index.phpにリダイレクト
-header('Location: index.php');
-exit();
-?>

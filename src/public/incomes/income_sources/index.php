@@ -44,7 +44,7 @@ try {
           <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="/spendings/index.php">支出TOP</a></li>
           <li>
-            <?php if (isset($_SESSION['username'])): ?>
+            <?php if (isset($_SESSION['user']['name'])): ?>
             <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
             <?php else: ?>
             <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
@@ -78,8 +78,8 @@ try {
                 foreach ($incomeSources as $incomeSource) {
                     echo '<tr>';
                     echo '<td class="border px-4 py-2">' . htmlspecialchars($incomeSource->getIncomeSourcesName(), ENT_QUOTES, 'UTF-8') . '</td>';
-                    echo '<td class="border px-4 py-2"><a href="edit.php?id=' . htmlspecialchars($incomeSource->getUserId(), ENT_QUOTES, 'UTF-8') . '" class="p-2 bg-blue-500 text-white">編集</a></td>';
-                    echo '<td class="border px-4 py-2"><a href="delete.php?id=' . htmlspecialchars($incomeSource->getUserId(), ENT_QUOTES, 'UTF-8') . '" class="p-2 bg-red-500 text-white">削除</a></td>';
+                    echo '<td class="border px-4 py-2"><a href="edit.php?id=' . htmlspecialchars($incomeSource->getId(), ENT_QUOTES, 'UTF-8') . '" class="p-2 bg-blue-500 text-white">編集</a></td>';
+                    echo '<td class="border px-4 py-2"><a href="delete.php?id=' . htmlspecialchars($incomeSource->getId(), ENT_QUOTES, 'UTF-8') . '" onclick="return confirm(\'本当に削除しますか？\');" class="p-2 bg-red-500 text-white">削除</a></td>';
                     echo '</tr>';
                 }
             } else {
