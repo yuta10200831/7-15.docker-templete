@@ -4,28 +4,28 @@ namespace App\UseCase\UseCaseInput;
 
 class IncomesReadInput
 {
-    private ?int $incomeSourceId;
-    private ?string $startDate;
-    private ?string $endDate;
+    private $incomeSourceId;
+    private $startDate;
+    private $endDate;
 
-    public function __construct(?int $incomeSourceId = null, ?string $startDate = null, ?string $endDate = null)
+    public function __construct($incomeSourceId, $startDate, $endDate)
     {
         $this->incomeSourceId = $incomeSourceId;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
     }
 
-    public function getIncomeSourceId(): ?int
+    public function getIncomeSourceId()
     {
         return $this->incomeSourceId;
     }
 
-    public function getStartDate(): ?string
+    public function getStartDate()
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?string
+    public function getEndDate()
     {
         return $this->endDate;
     }
