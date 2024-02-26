@@ -24,7 +24,7 @@ class Spendings
 
     public function getCategory_id()
     {
-      return $this->category_id;
+        return $this->category_id;
     }
 
     public function getAmount()

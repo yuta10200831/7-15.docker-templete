@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Dao;
 
 use PDO;
+use PDOException;
 use Exception;
 use App\Domain\Entity\Spendings;
 
@@ -32,34 +33,38 @@ class SpendingsDao {
         }
     }
 
-    public function fetchSpendingsWithFilter($year, $categoryId = null, $startDate = null, $endDate = null) {
-        $query = "SELECT * FROM spendings WHERE YEAR(accrual_date) = :year";
-        $params = [':year' => $year];
+    public function fetchAllSpendings($categoryId = null, $startDate = null, $endDate = null) {
+        $sql = "SELECT * FROM spendings WHERE 1=1";
+        $params = [];
 
-        if ($categoryId !== null) {
-            $query .= " AND category_id = :categoryId";
-            $params[':categoryId'] = $categoryId;
-        }
-        if ($startDate !== null) {
-            $query .= " AND accrual_date >= :startDate";
-            $params[':startDate'] = $startDate;
-        }
-        if ($endDate !== null) {
-            $query .= " AND accrual_date <= :endDate";
-            $params[':endDate'] = $endDate;
+        if (!is_null($categoryId) && $categoryId !== '') {
+            $sql .= " AND category_id = ?";
+            $params[] = $categoryId;
         }
 
-        $stmt = $this->pdo->prepare($query);
+        if (!empty($startDate)) {
+            $sql .= " AND accrual_date >= ?";
+            $params[] = $startDate;
+        }
+
+        if (!empty($endDate)) {
+            $sql .= " AND accrual_date <= ?";
+            $params[] = $endDate;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-        // 支出の合計を取得するメソッド
-    public function getTotalSpendingsByMonthAndYear($year, $month) {
-        $stmt = $this->pdo->prepare("SELECT SUM(amount) as total_spend FROM spendings WHERE YEAR(accrual_date) = :year AND MONTH(accrual_date) = :month");
-        $stmt->execute([':year' => $year, ':month' => $month]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getCategories() {
+        $stmt = $this->pdo->query("SELECT * FROM categories");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-        return $result ? $result['total_spend'] : 0;
+    public function fetchSpendingsByCategoryId($categoryId) {
+        $stmt = $this->pdo->prepare("SELECT * FROM spendings WHERE category_id = ?");
+        $stmt->execute([$categoryId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
