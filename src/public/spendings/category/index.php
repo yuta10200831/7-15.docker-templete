@@ -11,8 +11,7 @@ use App\UseCase\UseCaseOutput\CategoryReadOutput;
 try {
     $categoryDao = new CategoryDao();
     $queryService = new CategoryQueryService($categoryDao);
-    $categoryInput = new CategoryReadInput('');
-    $categoryInteractor = new CategoryReadInteractor($queryService, $categoryInput);
+    $categoryInteractor = new CategoryReadInteractor($queryService);
     $output = $categoryInteractor->handle();
 
     $categories = $output->getCategories();

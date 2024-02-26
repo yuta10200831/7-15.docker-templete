@@ -3,18 +3,15 @@
 namespace App\UseCase\UseCaseInteractor;
 
 use App\Domain\Port\ICategoryQuery;
-use App\UseCase\UseCaseInput\CategoryReadInput;
 use App\UseCase\UseCaseOutput\CategoryReadOutput;
 
 class CategoryReadInteractor
 {
     private ICategoryQuery $categoryQuery;
-    private CategoryReadInput $input;
 
-    public function __construct(ICategoryQuery $categoryQuery, CategoryReadInput $input)
+    public function __construct(ICategoryQuery $categoryQuery)
     {
         $this->categoryQuery = $categoryQuery;
-        $this->input = $input;
     }
 
     public function handle(): CategoryReadOutput
