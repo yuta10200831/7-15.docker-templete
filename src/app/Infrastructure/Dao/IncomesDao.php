@@ -36,34 +36,24 @@ class IncomesDao {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function fetchIncomesWithFilter($year, $categoryId = null, $startDate = null, $endDate = null) {
-        $query = "SELECT * FROM incomes WHERE YEAR(accrual_date) = :year";
-        $params = [':year' => $year];
+    public function fetchIncomesFiltered($incomeSourceId, $startDate, $endDate) {
+        $sql = "SELECT incomes.*, income_sources.name AS income_source_name FROM incomes";
+        $sql .= " JOIN income_sources ON incomes.income_source_id = income_sources.id WHERE 1=1";
+        $params = [];
 
-        if ($categoryId !== null) {
-            $query .= " AND category_id = :categoryId";
-            $params[':categoryId'] = $categoryId;
-        }
-        if ($startDate !== null) {
-            $query .= " AND accrual_date >= :startDate";
-            $params[':startDate'] = $startDate;
-        }
-        if ($endDate !== null) {
-            $query .= " AND accrual_date <= :endDate";
-            $params[':endDate'] = $endDate;
+        if (!empty($incomeSourceId)) {
+            $sql .= " AND incomes.income_source_id = ?";
+            $params[] = $incomeSourceId;
         }
 
-        $stmt = $this->pdo->prepare($query);
+        if (!empty($startDate) && !empty($endDate)) {
+            $sql .= " AND incomes.accrual_date BETWEEN ? AND ?";
+            $params[] = $startDate;
+            $params[] = $endDate;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-        // 収入の合計を取得するメソッド
-    public function getTotalIncomesByMonthAndYear($year, $month) {
-        $stmt = $this->pdo->prepare("SELECT SUM(amount) as total_income FROM incomes WHERE YEAR(accrual_date) = :year AND MONTH(accrual_date) = :month");
-        $stmt->execute([':year' => $year, ':month' => $month]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $result ? $result['total_income'] : 0;
     }
 }
