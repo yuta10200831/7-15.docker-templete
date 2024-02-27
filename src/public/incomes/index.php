@@ -19,6 +19,7 @@ $input = new IncomesReadInput($search_income_source_id, $search_start_date, $sea
 $incomesReadInteractor = new IncomesReadInteractor($incomesQueryService, $input);
 $output = $incomesReadInteractor->handle();
 $incomes = $output->getIncomes();
+
 $incomeSources = $incomesQueryService->fetchIncomeSources();
 
 $total_income = array_sum(array_column($incomes, 'amount'));
