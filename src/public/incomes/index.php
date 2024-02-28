@@ -22,6 +22,14 @@ $output = $incomesReadInteractor->handle();
 $incomes = $output->getIncomes();
 $incomeSources = $incomesQueryService->fetchIncomeSources();
 
+// 合計額を計算
+$total_income = array_sum(array_column($incomes, 'amount'));
+
+$errors = $_SESSION['errors'] ?? [];
+unset($_SESSION['errors']);
+$successMessage = $_SESSION['success'] ?? '';
+unset($_SESSION['success']);
+
 ?>
 
 <!DOCTYPE html>

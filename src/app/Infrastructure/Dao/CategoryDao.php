@@ -41,4 +41,9 @@ class CategoryDao {
         $result = $stmt->fetch();
         return $result !== false;
     }
+
+    public function fetchAll(): array {
+        $stmt = $this->pdo->query("SELECT * FROM categories");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
