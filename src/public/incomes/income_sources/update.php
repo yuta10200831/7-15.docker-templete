@@ -1,15 +1,15 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use App\UseCase\UseCaseInput\IncomeSourcesEditInput;
 use App\UseCase\UseCaseInteractor\IncomeSourcesEditInteractor;
 use App\Infrastructure\Dao\IncomeSourcesDao;
 use App\Adapter\Repository\IncomeSourcesRepository;
 
-$id = $GET['id'] ?? null;
-$name = trim($GET['name'] ?? '');
+$id = $_GET['id'] ?? null;
+$name = trim($_GET['name'] ?? '');
 
 if ($id === null || $name === '') {
     $_SESSION['error_message'] = 'IDと収入源名は必須です。';

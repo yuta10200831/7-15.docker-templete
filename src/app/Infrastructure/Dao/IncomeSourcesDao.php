@@ -32,7 +32,7 @@ class IncomeSourcesDao {
     }
 
     public function findAll(): array {
-        $sql = "SELECT user_id, name FROM income_sources";
+        $sql = "SELECT id, user_id, name FROM income_sources";
         $stmt = $this->pdo->query($sql);
 
         if ($stmt === false) {
@@ -44,8 +44,8 @@ class IncomeSourcesDao {
     public function update(IncomeSources $incomeSources): void {
         $stmt = $this->pdo->prepare("UPDATE income_sources SET name = :name WHERE id = :id");
         $result = $stmt->execute([
-            ':name' => $incomeSources->getIncomeSourcesName(),
-            ':id' => $incomeSources->getId()
+            ':id' => $incomeSources->getId(),
+            ':name' => $incomeSources->getIncomeSourcesName()
         ]);
 
         if (!$result) {

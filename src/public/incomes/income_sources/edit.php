@@ -14,11 +14,11 @@ if ($id === null) {
 
 try {
     $incomeSource = $dao->findById($id);
+
     if ($incomeSource === false) {
         echo "エラー: 指定された収入源が見つかりません。";
         exit;
     }
-    echo "収入源名: " . htmlspecialchars($incomeSource['name'], ENT_QUOTES, 'UTF-8');
 } catch (Exception $e) {
     echo "エラー発生: " . $e->getMessage();
     exit;
