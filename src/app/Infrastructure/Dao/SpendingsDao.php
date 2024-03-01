@@ -67,4 +67,20 @@ class SpendingsDao {
         $stmt->execute([$categoryId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function updateSpending(int $id, string $name, int $category_id, float $amount, string $accrual_date) {
+        $sql = "UPDATE spendings SET name = ?, category_id = ?, amount = ?, accrual_date = ? WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $result = $stmt->execute([$name, $category_id, $amount, $accrual_date, $id]);
+
+        if (!$result) {
+            throw new Exception("支出情報の更新に失敗しました。");
+        }
+    }
+
+    public function fetchSpendingById(int $id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM spendings WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
