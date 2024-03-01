@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use App\Infrastructure\Dao\IncomeSourcesDao;
 
 $dao = new IncomeSourcesDao();
-$id = $_GET['id'] ?? null;
+// IDの取得とバリデーションを修正
+$id = isset($_GET['id']) && $_GET['id'] !== '' ? $_GET['id'] : null;
 
 if ($id === null) {
     echo "エラー: IDが指定されていません。";

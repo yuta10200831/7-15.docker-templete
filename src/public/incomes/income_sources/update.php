@@ -8,8 +8,8 @@ use App\UseCase\UseCaseInteractor\IncomeSourcesEditInteractor;
 use App\Infrastructure\Dao\IncomeSourcesDao;
 use App\Adapter\Repository\IncomeSourcesRepository;
 
-$id = $_GET['id'] ?? null;
-$name = trim($_GET['name'] ?? '');
+$id = $_POST['id'] ?? null;
+$name = trim($_POST['name'] ?? '');
 
 if ($id === null || $name === '') {
     $_SESSION['error_message'] = 'IDと収入源名は必須です。';
