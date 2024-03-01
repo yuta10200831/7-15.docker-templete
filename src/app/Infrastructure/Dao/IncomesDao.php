@@ -62,9 +62,9 @@ class IncomesDao {
         $stmt = $this->pdo->prepare($sql);
 
         $stmt->bindValue(':id', $income->getId(), PDO::PARAM_INT);
-        $stmt->bindValue(':amount', $income->getAmount()->getValue(), PDO::PARAM_STR);
-        $stmt->bindValue(':accrualDate', $income->getAccrualDate()->getValue(), PDO::PARAM_STR);
-        $stmt->bindValue(':incomeSourceId', $income->getIncomeSourceId()->getValue(), PDO::PARAM_INT);
+        $stmt->bindValue(':amount', $income->getAmount(), PDO::PARAM_STR);
+        $stmt->bindValue(':accrualDate', $income->getAccrualDate()->format('Y-m-d'), PDO::PARAM_STR);
+        $stmt->bindValue(':incomeSourceId', $income->getIncomeSourceId(), PDO::PARAM_INT);
 
         if (!$stmt->execute()) {
             throw new Exception("収入情報の更新に失敗しました。");

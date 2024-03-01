@@ -25,9 +25,12 @@ if (is_null($id) || empty($amount) || empty($accrualDate) || empty($incomeSource
 
 try {
   $amountVO = new Amount((float)$amount);
-  $accrualDateVO = new AccrualDate($accrualDate);
+  $amountValue = $amountVO->getValue();
+  $accrualDateVO = new \DateTime($accrualDate);
   $incomeSourceIdVO = new IncomesSourceId((int)$incomeSourceId);
-  $input = new IncomesEditInput($id, $amountVO, $accrualDateVO, $incomeSourceIdVO);
+  $incomeSourceIdValue = $incomeSourceIdVO->getValue();
+  $input = new IncomesEditInput((int)$id, $amountValue, $accrualDateVO, $incomeSourceIdValue);
+
   $incomesDao = new IncomesDao();
   $incomesRepository = new IncomesRepository($incomesDao);
   $incomesEditInteractor = new IncomesEditInteractor($incomesRepository, $input);
