@@ -33,19 +33,4 @@ class SpendingsRepository implements ISpendingsCommand, ISpendingsEditCommand {
 
         $this->spendingsDao->updateSpending($id, $name, $category_id, $amount, $accrual_date);
     }
-
-    public function find(int $id): ?Spendings {
-        $data = $this->spendingsDao->fetchSpendingById($id);
-        if (!$data) {
-            return null;
-        }
-
-        return new Spendings(
-            $data['id'],
-            $data['name'],
-            $data['category_id'],
-            $data['amount'],
-            $data['accrual_date']
-        );
-    }
 }

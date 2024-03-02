@@ -83,4 +83,20 @@ class SpendingsDao {
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function fetchSpendingWithCategoryById($id) {
+        $sql = "SELECT s.*, c.name AS category_name
+                FROM spendings s
+                JOIN categories c ON s.category_id = c.id
+                WHERE s.id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            return $data;
+        } else {
+            return null;
+        }
+    }
 }

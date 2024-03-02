@@ -2,28 +2,41 @@
 
 session_start();
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 use App\UseCase\UseCaseInput\SpendingEditInput;
-use App\UseCase\UseCaseInput\SpendingEditInteractor;
+use App\UseCase\UseCaseInteractor\SpendingEditInteractor;
 use App\Infrastructure\Dao\SpendingsDao;
 use App\Adapter\Repository\SpendingsRepository;
 
-$editExpenseId = $_POST['id'] ?? 0;
-$editExpenseName = $_POST['expense_name'] ?? '';
-$editCategoryID = $_POST['category_id'] ?? 0;
-$editAmount = $_POST['amount'] ?? 0.0;
-$editAccrualDate = $_POST['expense_date'] ?? '';
+$spendingId = $_POST['id'] ?? null;
+$name = $_POST['name'] ?? '';
+$categoryId = $_POST['category_id'] ?? null;
+$amount = $_POST['amount'] ?? 0.0;
+$date = $_POST['date'] ?? '';
 
-$dao = new SpendingsDao();
-$repository = new SpendingsRepository($dao);
-$inputData = new SpendingEditInput($editExpenseId, $editExpenseName, $editCategoryID, $editAmount, $editAccrualDate);
-$interactor = new SpendingEditInteractor($repository, $inputData);
-$outputData = $interactor->handle();
+if (is_null($spendingId)) {
+    throw new Exception("支出IDが指定されていません。");
+}
 
-if ($outputData->success) {
-    header("Location: index.php");
-    exit;
-} else {
-    $_SESSION['errors'] = ['update_error' => $outputData->message];
-    header("Location: edit.php?id=" . $editExpenseId);
+try {
+    $dao = new SpendingsDao();
+    $repository = new SpendingsRepository($dao);
+    $inputData = new SpendingEditInput($spendingId, $name, $categoryId, $amount, $date);
+    $interactor = new SpendingEditInteractor($repository, $inputData);
+
+    $outputData = $interactor->handle();
+
+    if ($outputData->success) {
+        header("Location: index.php");
+        exit;
+    } else {
+        $_SESSION['errors'] = ['update_error' => $outputData->message];
+        header("Location: edit.php?id=" . $spendingId);
+        exit;
+    }
+} catch (Exception $e) {
+    $_SESSION['errors'] = ['exception' => "支出の更新処理中にエラーが発生しました: " . $e->getMessage()];
+    header("Location: edit.php?id=" . (isset($spendingId) ? $spendingId : ''));
     exit;
 }
