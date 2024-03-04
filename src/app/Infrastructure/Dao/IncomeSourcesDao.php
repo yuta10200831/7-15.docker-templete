@@ -32,12 +32,31 @@ class IncomeSourcesDao {
     }
 
     public function findAll(): array {
-        $sql = "SELECT user_id, name FROM income_sources";
+        $sql = "SELECT id, user_id, name FROM income_sources";
         $stmt = $this->pdo->query($sql);
 
         if ($stmt === false) {
             throw new Exception("クエリの実行に失敗しました。");
         }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function update(IncomeSources $incomeSources): void {
+        $stmt = $this->pdo->prepare("UPDATE income_sources SET name = :name WHERE id = :id");
+        $result = $stmt->execute([
+            ':id' => $incomeSources->getId(),
+            ':name' => $incomeSources->getIncomeSourcesName()
+        ]);
+
+        if (!$result) {
+            throw new Exception("収入源の更新に失敗しました。");
+        }
+    }
+
+    public function findById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM income_sources WHERE id = :id");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

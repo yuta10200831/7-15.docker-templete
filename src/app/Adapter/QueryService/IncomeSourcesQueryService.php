@@ -19,6 +19,7 @@ class IncomeSourcesQueryService implements IIncomeSourcesQuery {
             $incomeSourcesList = [];
             foreach ($incomeSourcesData as $data) {
                 $incomeSourcesList[] = new IncomeSources(
+                    $data['id'],
                     $data['user_id'],
                     $data['name']
                 );
