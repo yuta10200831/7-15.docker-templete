@@ -57,14 +57,14 @@ class IncomesDao {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function edit($id, $amount, $accrualDate, $incomeSourceId) {
+    public function update(Incomes $income) {
         $sql = "UPDATE incomes SET amount = :amount, accrual_date = :accrualDate, income_source_id = :incomeSourceId WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
 
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->bindValue(':amount', $amount->getValue(), PDO::PARAM_STR);
-        $stmt->bindValue(':accrualDate', $accrualDate->getValue(), PDO::PARAM_STR);
-        $stmt->bindValue(':incomeSourceId', $incomeSourceId, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $income->getId(), PDO::PARAM_INT);
+        $stmt->bindValue(':amount', $income->getAmount(), PDO::PARAM_STR);
+        $stmt->bindValue(':accrualDate', $income->getAccrualDate()->format('Y-m-d'), PDO::PARAM_STR);
+        $stmt->bindValue(':incomeSourceId', $income->getIncomeSourceId(), PDO::PARAM_INT);
 
         if (!$stmt->execute()) {
             throw new Exception("収入情報の更新に失敗しました。");

@@ -3,31 +3,31 @@
 namespace App\UseCase\UseCaseInput;
 
 class IncomesEditInput {
-    private $id;
-    private $amount;
-    private $accrualDate;
-    private $incomeSourceId;
+    private int $id;
+    private float $amount;
+    private \DateTime $accrualDate;
+    private int $incomeSourceId;
 
-    public function __construct($id, $amount, $accrualDate, $incomeSourceId) {
+    public function __construct(int $id, float $amount, \DateTime $accrualDate, int $incomeSourceId) {
         $this->id = $id;
         $this->amount = $amount;
         $this->accrualDate = $accrualDate;
         $this->incomeSourceId = $incomeSourceId;
     }
 
-    public function getId() {
+    public function getId(): int {
         return $this->id;
     }
 
-    public function getAmount() {
+    public function getAmount(): float {
         return $this->amount;
     }
 
-    public function getAccrualDate() {
+    public function getAccrualDate(): \DateTime {
         return $this->accrualDate;
     }
 
-    public function getIncomeSourceId() {
+    public function getIncomeSourceId(): int {
         return $this->incomeSourceId;
     }
 }

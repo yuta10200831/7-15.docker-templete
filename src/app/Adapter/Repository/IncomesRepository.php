@@ -27,16 +27,12 @@ class IncomesRepository implements IIncomesCommand, IIncomesEditCommand {
         $this->incomesDao->save($incomes, $userId);
     }
 
-    public function edit($id, Incomes $income): void {
+    public function update(Incomes $income): void {
+        $id = $income->getId();
         $amount = $income->getAmount();
-
         $accrualDate = $income->getAccrualDate();
+        $incomeSourceId = $income->getIncomeSourceId();
 
-        $this->incomesDao->edit(
-            $id,
-            $amount,
-            $accrualDate,
-            $income->getIncomeSourceId()
-        );
+        $this->incomesDao->update($income);
     }
 }

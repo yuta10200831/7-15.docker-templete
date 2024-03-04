@@ -19,6 +19,7 @@ class IncomesInteractor {
     public function handle(): IncomesOutput {
         try {
             $incomes = new Incomes(
+                null,
                 $this->input->getIncomesSourceId()->getValue(),
                 $this->input->getAmount()->getValue(),
                 $this->input->getAccrualDate()->getValue()
