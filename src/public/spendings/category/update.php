@@ -27,8 +27,6 @@ try {
     $interactor = new CategoryEditInteractor($categoryRepository, $input);
     $result = $interactor->handle();
 
-    var_dump($result);
-    die;
     if ($result->isSuccess()) {
         header("Location: index.php?message=" . urlencode($result->getMessage()));
         exit;

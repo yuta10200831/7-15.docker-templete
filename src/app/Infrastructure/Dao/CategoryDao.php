@@ -47,7 +47,7 @@ class CategoryDao {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function updateCategory(Category $category): void {
+    public function updateCategory(Category $category): bool {
         $stmt = $this->pdo->prepare("UPDATE categories SET name = :name, user_id = :user_id WHERE id = :id");
         $result = $stmt->execute([
             ':id' => $category->getId(),
@@ -57,8 +57,9 @@ class CategoryDao {
 
         if (!$result) {
             $errorInfo = $stmt->errorInfo();
-            throw new Exception("カテゴリの更新に失敗しました。エラー詳細: ");
+            throw new Exception("カテゴリの更新に失敗しました ");
         }
+        return $result;
     }
 
     public function findCategoryById(int $id): ?Category {

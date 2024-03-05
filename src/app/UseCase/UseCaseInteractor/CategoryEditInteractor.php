@@ -28,6 +28,8 @@ class CategoryEditInteractor
                 $this->input->getUserId()
             );
 
+            $this->categoryRepository->updateCategory($category);
+
             return new CategoryOutput(true, "カテゴリが更新されました");
 
         } catch (\Exception $e) {
