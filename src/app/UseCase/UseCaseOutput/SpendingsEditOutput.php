@@ -2,7 +2,7 @@
 
 namespace App\UseCase\UseCaseOutput;
 
-class SpendingEditOutput {
+class SpendingsEditOutput {
     public bool $success;
     public string $message;
 

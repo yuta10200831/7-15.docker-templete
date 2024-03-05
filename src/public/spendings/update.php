@@ -4,8 +4,8 @@ session_start();
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use App\UseCase\UseCaseInput\SpendingEditInput;
-use App\UseCase\UseCaseInteractor\SpendingEditInteractor;
+use App\UseCase\UseCaseInput\SpendingsEditInput;
+use App\UseCase\UseCaseInteractor\SpendingsEditInteractor;
 use App\Infrastructure\Dao\SpendingsDao;
 use App\Adapter\Repository\SpendingsRepository;
 
@@ -22,8 +22,8 @@ if (is_null($spendingId)) {
 try {
     $dao = new SpendingsDao();
     $repository = new SpendingsRepository($dao);
-    $inputData = new SpendingEditInput($spendingId, $name, $categoryId, $amount, $date);
-    $interactor = new SpendingEditInteractor($repository, $inputData);
+    $inputData = new SpendingsEditInput($spendingId, $name, $categoryId, $amount, $date);
+    $interactor = new SpendingsEditInteractor($repository, $inputData);
 
     $outputData = $interactor->handle();
 

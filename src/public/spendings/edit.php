@@ -73,13 +73,13 @@ $categories = $spendingsQueryService->getCategories();
         <div class="mb-4">
           <label for="name">支出名：</label>
           <input type="text" id="name" name="name"
-            value="<?= htmlspecialchars($spending->getName(), ENT_QUOTES, 'UTF-8') ?>">
+            value="<?= htmlspecialchars($spending-> getSpendingsName(), ENT_QUOTES, 'UTF-8') ?>">
         </div>
 
         <select name="category_id" id="category">
           <?php foreach ($categories as $category): ?>
           <option value="<?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?>"
-            <?= $category['id'] == $spending->getCategory_id() ? 'selected' : '' ?>>
+            <?= $category['id'] == $spending->getCategoryId() ? 'selected' : '' ?>>
             <?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') ?>
           </option>
           <?php endforeach; ?>

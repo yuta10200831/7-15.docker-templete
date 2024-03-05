@@ -2,7 +2,7 @@
 
 namespace App\UseCase\UseCaseInput;
 
-class SpendingEditInput {
+class SpendingsEditInput {
     public int $id;
     public string $name;
     public int $categoryId;
