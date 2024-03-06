@@ -10,4 +10,12 @@ class SpendingsEditOutput {
         $this->success = $success;
         $this->message = $message;
     }
+
+    public function isSuccess() {
+        return $this->success;
+    }
+
+    public function getMessage() {
+        return $this->message;
+    }
 }

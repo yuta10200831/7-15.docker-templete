@@ -16,4 +16,24 @@ class SpendingsEditInput {
         $this->amount = $amount;
         $this->accrualDate = $accrualDate;
     }
+
+        public function getId(): int {
+            return $this->id;
+        }
+
+        public function getName(): string {
+            return $this->name;
+        }
+
+        public function getCategoryId(): int {
+            return $this->categoryId;
+        }
+
+        public function getAmount(): float {
+            return $this->amount;
+        }
+
+        public function getAccrualDate(): string {
+            return $this->accrualDate;
+        }
 }
