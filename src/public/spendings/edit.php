@@ -5,12 +5,14 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Infrastructure\Dao\SpendingsDao;
-use App\Adapter\Repository\SpendingsRepository;
 use App\Adapter\QueryService\SpendingsQueryService;
+use App\Infrastructure\Dao\CategoryDao;
+use App\Adapter\QueryService\CategoryQueryService;
 
 $spendingsDao = new SpendingsDao();
-$spendingsRepository = new SpendingsRepository($spendingsDao);
 $spendingsQueryService = new SpendingsQueryService($spendingsDao);
+$categoryDao = new CategoryDao();
+$categoryQueryService = new CategoryQueryService($categoryDao);
 
 $errors = $_SESSION['errors'] ?? [];
 unset($_SESSION['errors']);
@@ -22,7 +24,7 @@ if ($id === null) {
 }
 
 $spending = $spendingsQueryService->find($id);
-$categories = $spendingsQueryService->getCategories();
+$categories = $categoryQueryService->getCategories();
 
 ?>
 

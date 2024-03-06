@@ -15,4 +15,8 @@ class CategoryQueryService implements ICategoryQuery {
     public function fetchAll(): array {
         return $this->categoryDao->fetchAll();
     }
+
+    public function getCategories(): array {
+        return $this->fetchAll();
+    }
 }
