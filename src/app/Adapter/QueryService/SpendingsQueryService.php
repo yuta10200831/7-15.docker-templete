@@ -4,6 +4,7 @@ namespace App\Adapter\QueryService;
 
 use App\Domain\Port\ISpendingsQuery;
 use App\Infrastructure\Dao\SpendingsDao;
+use App\Domain\Entity\Spendings;
 
 class SpendingsQueryService implements ISpendingsQuery {
     private $spendingsDao;
@@ -26,5 +27,24 @@ class SpendingsQueryService implements ISpendingsQuery {
 
     public function fetchSpendingsByCategoryId($categoryId) {
         return $this->spendingsDao->fetchSpendingsByCategoryId($categoryId);
+    }
+
+    public function find(int $id): ?Spendings {
+        $data = $this->spendingsDao->fetchSpendingById($id);
+        if (!$data) {
+            return null;
+        }
+
+        return new Spendings(
+            $data['id'],
+            $data['name'],
+            $data['category_id'],
+            $data['amount'],
+            $data['accrual_date']
+        );
+    }
+
+    public function findWithCategory($id) {
+        return $this->spendingsDao->fetchSpendingWithCategoryById($id);
     }
 }

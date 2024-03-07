@@ -1,32 +1,42 @@
 <?php
+
 session_start();
 
-// セッションからエラーメッセージを取得して削除
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use App\Infrastructure\Dao\SpendingsDao;
+use App\Adapter\QueryService\SpendingsQueryService;
+use App\Infrastructure\Dao\CategoryDao;
+use App\Adapter\QueryService\CategoryQueryService;
+
+$spendingsDao = new SpendingsDao();
+$spendingsQueryService = new SpendingsQueryService($spendingsDao);
+$categoryDao = new CategoryDao();
+$categoryQueryService = new CategoryQueryService($categoryDao);
+
 $errors = $_SESSION['errors'] ?? [];
 unset($_SESSION['errors']);
 
-// 以下、元々のコード
-$id = $_GET['id'];
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-$stmt = $pdo->prepare("SELECT * FROM spendings WHERE id = ?");
-$stmt->execute([$id]);
-$spending = $stmt->fetch(PDO::FETCH_ASSOC);
+$id = $_GET['id'] ?? null;
 
-// カテゴリデータを取得
-$category_sql = "SELECT * FROM categories";
-$category_stmt = $pdo->query($category_sql);
-$categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($id === null) {
+    exit("IDが指定されていません。");
+}
+
+$spending = $spendingsQueryService->find($id);
+$categories = $categoryQueryService->getCategories();
 
 ?>
 
-
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <title>支出編集</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex justify-center">
 
   <div class="mx-auto my-8 w-4/5">
@@ -35,13 +45,13 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
       <nav>
         <ul class="flex justify-between">
           <li><a class="text-white hover:text-blue-800" href="/">HOME</a></li>
-          <li><a class="text-white hover:text-blue-800" href="incomes/index.php">収入TOP</a></li>
+          <li><a class="text-white hover:text-blue-800" href="/incomes/index.php">収入TOP</a></li>
           <li><a class="text-white hover:text-blue-800" href="index.php">支出TOP</a></li>
           <li>
-            <?php if (isset($_SESSION['username'])): ?>
-              <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
-            <?php else: ?>
-              <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
+            <?php if (isset($_SESSION['user']['name'])) : ?>
+            <a class="text-white hover:text-blue-800" href="/user/logout.php">ログアウト</a>
+            <?php else : ?>
+            <a class="text-white hover:text-blue-800" href="/user/signin.php">ログイン</a>
             <?php endif; ?>
           </li>
         </ul>
@@ -50,48 +60,38 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="container p-4 bg-white rounded shadow-lg">
       <h1 class="text-3xl mb-4 text-center">支出編集</h1>
-        <!-- ここにエラーメッセージを表示 -->
-        <?php if (!empty($errors)): ?>
-          <div class="bg-red-100 p-4 mb-4 rounded">
-            <?php foreach ($errors as $error): ?>
-              <p class="text-red-500"><?= $error ?></p>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
+      <!-- ここにエラーメッセージを表示 -->
+      <?php if (!empty($errors)) : ?>
+      <div class="bg-red-100 p-4 mb-4 rounded">
+        <?php foreach ($errors as $error) : ?>
+        <p class="text-red-500"><?= $error ?></p>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
       <form action="update.php" method="POST">
-        <!-- hidden ID field -->
-        <input type="hidden" name="id" value="<?= $spending['id'] ?>">
+        <input type="hidden" name="id" value="<?= htmlspecialchars($spending->getId(), ENT_QUOTES, 'UTF-8') ?>">
 
         <!-- 支出名フォーム -->
         <div class="mb-4">
-          <label for="expense-name">支出名：</label>
-          <input type="text" id="expense-name" name="expense_name" value="<?= $spending['name'] ?>">
+          <label for="name">支出名：</label>
+          <input type="text" id="name" name="name"
+            value="<?= htmlspecialchars($spending-> getSpendingsName(), ENT_QUOTES, 'UTF-8') ?>">
         </div>
 
-        <!-- カテゴリーフォーム -->
-        <div class="mb-4">
-          <label for="category">カテゴリー：</label>
-          <select name="category_id" id="category">
-            <?php foreach ($categories as $category): ?>
-              <option value="<?= $category['id'] ?>" <?= $category['id'] == $spending['category_id'] ? 'selected' : '' ?>>
-                <?= $category['name'] ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </div>
+        <select name="category_id" id="category">
+          <?php foreach ($categories as $category): ?>
+          <option value="<?= htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8') ?>"
+            <?= $category['id'] == $spending->getCategoryId() ? 'selected' : '' ?>>
+            <?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') ?>
+          </option>
+          <?php endforeach; ?>
+        </select>
 
-        <!-- 金額フォーム -->
-        <div class="mb-4">
-          <label for="amount">金額</label>
-          <input type="text" id="amount" name="amount" value="<?= $spending['amount'] ?>">
-          <span>円</span>
-        </div>
+        <input type="text" id="amount" name="amount"
+          value="<?= htmlspecialchars($spending->getAmount(), ENT_QUOTES, 'UTF-8') ?>">
 
-        <!-- 日付フォーム -->
-        <div class="mb-4">
-          <label for="date">日付</label>
-          <input type="date" id="date" name="expense_date" value="<?= $spending['accrual_date'] ?>">
-        </div>
+        <input type="date" id="date" name="date"
+          value="<?= htmlspecialchars($spending->getAccrualDate(), ENT_QUOTES, 'UTF-8') ?>">
 
         <!-- 更新ボタン -->
         <div class="text-right">
@@ -103,4 +103,5 @@ $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
 </body>
+
 </html>

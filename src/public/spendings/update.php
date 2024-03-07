@@ -1,39 +1,42 @@
 <?php
-session_start();  // セッションを開始
 
-$errors = [];
+session_start();
 
-// ガード節でPOSTデータがあるかチェック
-if (empty($_POST['expense_name'])) {
-  $errors['expense_name'] = '支出名が入力されていません';
-}
-if (empty($_POST['amount'])) {
-  $errors['amount'] = '金額が入力されていません';
-}
-if (empty($_POST['expense_date'])) {
-  $errors['expense_date'] = '日付が入力されていません';
-}
-if (empty($_POST['category_id'])) {
-  $errors['category_id'] = 'カテゴリが入力されていません';
-}
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-if (!empty($errors)) {
-  $_SESSION['errors'] = $errors;
-  header("Location: edit.php?id=" . $_POST['id']);
-  exit;
+use App\UseCase\UseCaseInput\SpendingsEditInput;
+use App\UseCase\UseCaseInteractor\SpendingsEditInteractor;
+use App\Infrastructure\Dao\SpendingsDao;
+use App\Adapter\Repository\SpendingsRepository;
+
+$spendingId = $_POST['id'] ?? null;
+$name = $_POST['name'] ?? '';
+$categoryId = $_POST['category_id'] ?? null;
+$amount = $_POST['amount'] ?? 0.0;
+$date = $_POST['date'] ?? '';
+
+if (is_null($spendingId)) {
+    throw new Exception("支出IDが指定されていません。");
 }
 
-// 以下、DB処理（ここはそのまま）
-$id = $_POST['id'];
-$name = $_POST['expense_name'];
-$category_id = $_POST['category_id'];
-$amount = $_POST['amount'];
-$accrual_date = $_POST['expense_date'];
+try {
+    $dao = new SpendingsDao();
+    $repository = new SpendingsRepository($dao);
+    $inputData = new SpendingsEditInput($spendingId, $name, $categoryId, $amount, $date);
+    $interactor = new SpendingsEditInteractor($repository, $inputData);
 
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
-$stmt = $pdo->prepare("UPDATE spendings SET name = ?, category_id = ?, amount = ?, accrual_date = ? WHERE id = ?");
-$result = $stmt->execute([$name, $category_id, $amount, $accrual_date, $id]);
+    $outputData = $interactor->handle();
 
-
-header("Location: index.php");
-exit;
+    if ($outputData->success) {
+        header("Location: index.php");
+        exit;
+    } else {
+        $_SESSION['errors'] = ['update_error' => $outputData->message];
+        header("Location: edit.php?id=" . $spendingId);
+        exit;
+    }
+} catch (Exception $e) {
+    $_SESSION['errors'] = ['exception' => "支出の更新処理中にエラーが発生しました: " . $e->getMessage()];
+    header("Location: edit.php?id=" . (isset($spendingId) ? $spendingId : ''));
+    exit;
+}
