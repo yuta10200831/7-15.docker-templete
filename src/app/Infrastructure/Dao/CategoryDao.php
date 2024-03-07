@@ -46,4 +46,33 @@ class CategoryDao {
         $stmt = $this->pdo->query("SELECT * FROM categories");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function updateCategory(Category $category): bool {
+        $stmt = $this->pdo->prepare("UPDATE categories SET name = :name, user_id = :user_id WHERE id = :id");
+        $result = $stmt->execute([
+            ':id' => $category->getId(),
+            ':name' => $category->getName(),
+            ':user_id' => $category->getUserId()
+        ]);
+
+        if (!$result) {
+            $errorInfo = $stmt->errorInfo();
+            throw new Exception("カテゴリの更新に失敗しました ");
+        }
+        return $result;
+    }
+
+    public function findCategoryById(int $id): ?Category {
+        $stmt = $this->pdo->prepare("SELECT * FROM categories WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$result) {
+            return null;
+        }
+
+        $category = new Category($result['id'], $result['name'], $result['user_id']);
+        return $category;
+    }
 }

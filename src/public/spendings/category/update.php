@@ -1,34 +1,40 @@
 <?php
-// POSTデータを受け取る
-$id = $_POST['id'];
-$name = $_POST['name'];
+session_start();
 
-// DB接続
-$pdo = new PDO('mysql:host=mysql; dbname=kakeibo; charset=utf8', 'root', 'password');
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-// 入力値が空だった場合
-if (empty($name)) {
-    header("Location: edit.php?id=$id&error=カテゴリ名が入力されていません");
-    exit;
+use App\UseCase\UseCaseInput\CategoryEditInput;
+use App\UseCase\UseCaseInteractor\CategoryEditInteractor;
+use App\Adapter\Repository\CategoryRepository;
+use App\Infrastructure\Dao\CategoryDao;
+
+$id = $_POST['id'] ?? null;
+$name = trim($_POST['name'] ?? '');
+
+if (empty($id) || empty($name)) {
+    throw new Exception("必要なデータが入力されていません。");
 }
 
-// 同じカテゴリ名がすでに存在する場合
-$stmt = $pdo->prepare("SELECT * FROM categories WHERE name = :name AND id != :id");
-$stmt->bindParam(':name', $name);
-$stmt->bindParam(':id', $id);
-$stmt->execute();
-$existing_category = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($existing_category) {
-    header("Location: edit.php?id=$id&error=このカテゴリ名はすでに存在しています");
-    exit;
+$userId = $_SESSION['user']['id'] ?? null;
+if (!$userId) {
+    throw new Exception("ユーザーIDが取得できません。");
 }
 
-// 更新処理
-$stmt = $pdo->prepare("UPDATE categories SET name = :name WHERE id = :id");
-$stmt->bindParam(':name', $name);
-$stmt->bindParam(':id', $id);
-$stmt->execute();
+try {
+    $input = new CategoryEditInput($id, $name, $userId);
+    $categoryDao = new CategoryDao();
+    $categoryRepository = new CategoryRepository($categoryDao);
+    $interactor = new CategoryEditInteractor($categoryRepository, $input);
+    $result = $interactor->handle();
 
-header("Location: index.php");
+    if ($result->isSuccess()) {
+        header("Location: index.php?message=" . urlencode($result->getMessage()));
+        exit;
+    } else {
+        throw new Exception($result->getMessage());
+    }
+} catch (Exception $e) {
+    header("Location: edit.php?id=$id&error=" . urlencode($e->getMessage()));
+    exit;
+}
 ?>
